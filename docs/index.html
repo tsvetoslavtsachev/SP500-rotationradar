@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SP500 Rotation Radar</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>SP500 Rotation Radar</h1>
+  <p class="tagline">
+    "<strong>Купи лидерите, особено когато временно отслабнат.</strong>" —
+    <em>не "хвани падналите ангели"</em>.
+    <br>
+    <small>
+      Backtest 2022-2025 показва: <strong>Stable Winners +3.34% excess</strong> на 3-месечен horizon,
+      <strong>Quality Dip +1.72%</strong>, Faded Bounces −0.44%.
+      Mean reversion на quality > momentum bottom-fishing.
+    </small>
+  </p>
+  <div id="metadata" class="metadata"></div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="stable-winners-1m">🎯 Stable Winners (1m)</button>
+  <button class="tab" data-tab="stable-winners-3m">🎯 Stable Winners (3m)</button>
+  <button class="tab" data-tab="quality-dip-1m">💎 Quality Dip (1m)</button>
+  <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
+  <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
+  <button class="tab" data-tab="sectors">🌡 Sector Heatmap</button>
+  <button class="tab" data-tab="sub-industries">🔬 Sub-Industries</button>
+</nav>
+
+<main>
+  <section id="stable-winners-1m" class="view active">
+    <h2>🎯 Stable Winners — Лидери, които продължават да водят (1m)</h2>
+    <p class="view-desc">
+      Акции с <strong>висока база</strong> (топ 20% последните 6 месеца) и <strong>положителна ΔRank</strong> в последния месец.
+      Това е главният сигнал — backtest +3.34% excess на 63d horizon, hit rate 53.2%.
+      Лидерството не отстъпва. Тук е ровенето.
+    </p>
+    <div class="table-host"></div>
+  </section>
+
+  <section id="stable-winners-3m" class="view">
+    <h2>🎯 Stable Winners (3m delta)</h2>
+    <p class="view-desc">Същата логика, но 3-месечен поглед. По-стабилен, по-малко candidates.</p>
+    <div class="table-host"></div>
+  </section>
+
+  <section id="quality-dip-1m" class="view">
+    <h2>💎 Quality Dip — Лидери временно отслабнали (1m)</h2>
+    <p class="view-desc">
+      Акции с <strong>висока база</strong> (топ 20% последните 6 месеца) и <strong>отрицателна ΔRank</strong> наскоро.
+      Backtest +1.72% excess на 63d horizon, hit rate 49.6%. Mean reversion обикновено връща.
+      <br>
+      <strong>Cross-check:</strong> провери "Abs %ile" колоната — ако е под 50, акцията е sector-relative силна
+      но абсолютно слаба (best of bad sector), което може да е chronic decline, не Quality Dip.
+    </p>
+    <div class="table-host"></div>
+  </section>
+
+  <section id="quality-dip-3m" class="view">
+    <h2>💎 Quality Dip (3m delta)</h2>
+    <p class="view-desc">3-месечно отслабване на лидери. По-сериозна реакция → по-голяма възможност при reversion.</p>
+    <div class="table-host"></div>
+  </section>
+
+  <section id="faded-bounces" class="view">
+    <h2>⚠ Faded Bounces — какво да не гониш (1m)</h2>
+    <p class="view-desc">
+      Акции с <strong>низка база</strong> (под p20 последните 6 месеца) и <strong>скорошен скок</strong>.
+      Изглеждат като turnaround candidates — но backtest показа <strong>−0.44% excess</strong> на 63d horizon, hit rate 44.7%.
+      Падналите ангели рядко се възстановяват. Тук е contra-list — какво да НЕ купиш.
+    </p>
+    <div class="table-host"></div>
+  </section>
+
+  <section id="sectors" class="view">
+    <h2>🌡 Sector Rotation Heatmap</h2>
+    <p class="view-desc">
+      Средна ΔRank по GICS Sector. С sector-relative z-score scoring-а, секторните стойности отразяват
+      <em>интрасекторно лидерство</em>, не просто overall sector performance.
+    </p>
+    <div class="heatmap-host"></div>
+  </section>
+
+  <section id="sub-industries" class="view">
+    <h2>🔬 Sub-Industry Drilldown</h2>
+    <p class="view-desc">По-фина гранулярност — кои подсектори водят и кои изостават. Тематична ротация.</p>
+    <div class="table-host"></div>
+  </section>
+</main>
+
+<footer>
+  <p>
+    Скоринг: pure 12-1 momentum + GICS-sector-relative z-score • Прагове: p20/p80 • Refresh: daily
+    <br>
+    <strong>Не е инвестиционен съвет.</strong> Инструмент за research starting points, не за директно търгуване.
+    Survivorship bias caveat: backtest резултатите са оптимистично-биасирани (текущ SP500 universe).
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
