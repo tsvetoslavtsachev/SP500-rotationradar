@@ -26,6 +26,15 @@ from src.sector_engine import get_sector_dataframe  # noqa: E402
 from src.signal_engine import compute_cross_section  # noqa: E402
 from src.universe import fetch_full_universe  # noqa: E402
 
+
+def load_sector_map_for_scoring(cache_path: Path) -> dict[str, str]:
+    """
+    Зарежда GICS sector mapping за sector-relative z-score scoring.
+    Извиква sector_engine да опресни ако cache-ът е остарял.
+    """
+    df = get_sector_dataframe(cache_path)
+    return dict(zip(df["ticker"], df["gics_sector"]))
+
 DATA_DIR = ROOT / "data"
 HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
 PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
@@ -94,8 +103,10 @@ def main() -> None:
     prices = update_prices_cache(tickers)
     print(f"      {len(prices.columns)} tickers × {len(prices)} days")
 
-    print("[3/5] Computing today's cross-section...")
-    cs = compute_cross_section(prices)
+    print("[3/5] Computing today's cross-section (sector-relative z-score)...")
+    sector_map = load_sector_map_for_scoring(SECTOR_CACHE_PATH)
+    print(f"      Loaded {len(sector_map)} sector mappings")
+    cs = compute_cross_section(prices, sector_map=sector_map)
     cs = cs.dropna(subset=["raw_score"])
     print(f"      {len(cs)} valid scores for {cs['date'].iloc[0].date()}")
 
@@ -104,12 +115,18 @@ def main() -> None:
     size_mb = HISTORY_PATH.stat().st_size / 1e6
     print(f"      History now {size_mb:.1f} MB")
 
-    print("[5/5] Refreshing sector cache + rendering data.json...")
-    get_sector_dataframe(SECTOR_CACHE_PATH)  # auto-refresh ако е stale
+    print("[5/5] Rendering data.json...")
     payload = render_dashboard_data()
     print(f"      Rendered: as of {payload['metadata']['as_of']}")
-    print(f"      Risers 1m: {len(payload['risers_1m'])} | Decayers 1m: {len(payload['decayers_1m'])}")
-    print(f"      Sustained: {len(payload['sustained_risers'])} | Sectors: {len(payload['sector_rotation'])}")
+    print(
+        f"      Stable Winners 1m: {len(payload['stable_winners_1m'])} | "
+        f"Quality Dip 1m: {len(payload['quality_dip_1m'])} | "
+        f"Faded Bounces: {len(payload['faded_bounces_1m'])}"
+    )
+    print(
+        f"      Current Strength: {len(payload['current_strength'])} | "
+        f"Sectors: {len(payload['sector_rotation'])}"
+    )
 
     print("\nDaily update complete.")
 
