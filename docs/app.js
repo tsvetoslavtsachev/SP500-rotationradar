@@ -11,6 +11,7 @@
   renderWatchlist("quality-dip-1m", data.quality_dip_1m, "1m");
   renderWatchlist("quality-dip-3m", data.quality_dip_3m, "3m");
   renderWatchlist("faded-bounces", data.faded_bounces_1m, "1m");
+  renderCurrentStrength("current-strength", data.current_strength);
   renderHeatmap("sectors", data.sector_rotation);
   renderSubIndustryTable("sub-industries", data.sub_industry_rotation);
   setupTabs();
@@ -51,6 +52,7 @@ function renderWatchlist(viewId, rows, deltaWindow) {
     { key: "sector", label: "Sector" },
     { key: "current_rank", label: "Sector Rank" },
     { key: "abs_strength", label: "Abs %ile" },
+    { key: "mom_12_1_pct", label: "12-1 Mom %" },
     { key: "base_rank_6m", label: "Base (6m)" },
   ];
   if (showBoth) {
@@ -59,7 +61,7 @@ function renderWatchlist(viewId, rows, deltaWindow) {
   } else {
     headers.push({ key: `delta_${deltaWindow}`, label: `Δ ${deltaWindow}` });
   }
-  headers.push({ key: "trajectory", label: "Trajectory" });
+  headers.push({ key: "trajectory", label: "Rank Path (90d)" });
 
   const table = document.createElement("table");
   table.appendChild(buildThead(headers));
@@ -105,6 +107,15 @@ function buildTbody(rows, headers) {
         const v = row[h.key];
         td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
         td.dataset.value = v ?? "";
+      } else if (h.key === "mom_12_1_pct") {
+        const v = row[h.key];
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
       } else {
         td.textContent = row[h.key] ?? "—";
       }
@@ -149,7 +160,84 @@ function makeTrajectorySVG(points) {
   pathEl.setAttribute("fill", "none");
   svg.appendChild(pathEl);
 
+  // Hover tooltip — изяснява точно какво показва линията
+  const titleEl = document.createElementNS("http://www.w3.org/2000/svg", "title");
+  const startDate = points[0]?.date ?? "";
+  const endDate = points[points.length - 1]?.date ?? "";
+  titleEl.textContent =
+    `Sector Rank trajectory: ${first.toFixed(1)} → ${last.toFixed(1)} ` +
+    `(${startDate} → ${endDate}, ${points.length} търговски дни)`;
+  svg.appendChild(titleEl);
+
   return svg;
+}
+
+function renderCurrentStrength(viewId, rows) {
+  const host = document.querySelector(`#${viewId} .table-host`);
+  if (!rows || rows.length === 0) {
+    host.innerHTML = `<div class="empty-state">Няма данни за Current Strength.</div>`;
+    return;
+  }
+
+  const headers = [
+    { key: "rank_index", label: "#" },
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "mom_12_1_pct", label: "12-1 Mom %" },
+    { key: "abs_strength", label: "Abs %ile" },
+    { key: "current_rank", label: "Sector Rank" },
+    { key: "trajectory", label: "Rank Path (90d)" },
+  ];
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  headers.forEach((h, idx) => {
+    const th = document.createElement("th");
+    th.textContent = h.label;
+    th.dataset.col = idx;
+    th.dataset.key = h.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  rows.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    headers.forEach((h) => {
+      const td = document.createElement("td");
+      if (h.key === "rank_index") {
+        td.textContent = idx + 1;
+        td.dataset.value = idx + 1;
+      } else if (h.key === "ticker") {
+        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+      } else if (h.key === "trajectory") {
+        td.appendChild(makeTrajectorySVG(row.trajectory));
+      } else if (h.key === "mom_12_1_pct") {
+        const v = row[h.key];
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "abs_strength" || h.key === "current_rank") {
+        const v = row[h.key];
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+      } else {
+        td.textContent = row[h.key] ?? "—";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  host.replaceChildren(table);
+  attachSorting(table, headers);
 }
 
 function renderHeatmap(viewId, sectors) {

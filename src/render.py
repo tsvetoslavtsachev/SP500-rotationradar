@@ -31,13 +31,32 @@ from src.sector_engine import (  # noqa: E402
     aggregate_by_sub_industry,
     get_sector_dataframe,
 )
+from src.signal_engine import compute_ticker_mom  # noqa: E402
 
 DATA_DIR = ROOT / "data"
 DOCS_DIR = ROOT / "docs"
 HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
+PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
 SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
 OUTPUT_PATH = DOCS_DIR / "data.json"
 TRAJECTORY_DAYS = 90
+
+
+def compute_current_returns(prices_cache_path: Path = PRICES_CACHE_PATH) -> dict[str, float]:
+    """
+    Връща dict ticker → 12-1 momentum return (актуален). Пример: 0.27 = +27%.
+    Зарежда prices_cache.parquet и за всеки ticker пресмята класическия 12-1.
+    """
+    if not prices_cache_path.exists():
+        return {}
+    prices = pd.read_parquet(prices_cache_path)
+    prices.index = pd.to_datetime(prices.index)
+    out = {}
+    for ticker in prices.columns:
+        mom = compute_ticker_mom(prices[ticker])
+        if np.isfinite(mom):
+            out[ticker] = float(mom)
+    return out
 
 
 def _safe_round(x, ndigits: int = 1):
@@ -52,7 +71,11 @@ def _safe_str(x):
     return str(x) if not pd.isna(x) else None
 
 
-def _row_to_dict(row: pd.Series, sectors: pd.DataFrame) -> dict:
+def _row_to_dict(
+    row: pd.Series,
+    sectors: pd.DataFrame,
+    returns: dict[str, float] | None = None,
+) -> dict:
     sector_info = sectors[sectors["ticker"] == row["ticker"]]
     if sector_info.empty:
         name = sector = sub = None
@@ -61,6 +84,10 @@ def _row_to_dict(row: pd.Series, sectors: pd.DataFrame) -> dict:
         name = _safe_str(s.get("name"))
         sector = _safe_str(s.get("gics_sector"))
         sub = _safe_str(s.get("gics_sub_industry"))
+
+    mom_return = (returns or {}).get(row["ticker"])
+    mom_return_pct = round(mom_return * 100, 1) if mom_return is not None else None
+
     return {
         "ticker": row["ticker"],
         "name": name,
@@ -68,6 +95,7 @@ def _row_to_dict(row: pd.Series, sectors: pd.DataFrame) -> dict:
         "sub_industry": sub,
         "current_rank": _safe_round(row.get("current_rank")),
         "abs_strength": _safe_round(row.get("abs_strength")),
+        "mom_12_1_pct": mom_return_pct,
         "base_rank_6m": _safe_round(row.get("base_rank_6m")),
         "delta_1m": _safe_round(row.get("delta_1m")),
         "delta_3m": _safe_round(row.get("delta_3m")),
@@ -100,12 +128,20 @@ def render_dashboard_data(
         raise RuntimeError("Could not compute delta metrics — insufficient history")
 
     as_of = deltas["as_of_date"].iloc[0]
+    returns = compute_current_returns()
 
     stable_winners_1m = get_stable_winners(deltas, window="1m", limit=limit)
     stable_winners_3m = get_stable_winners(deltas, window="3m", limit=limit)
     quality_dip_1m = get_quality_dip(deltas, window="1m", limit=limit)
     quality_dip_3m = get_quality_dip(deltas, window="3m", limit=limit)
     faded_bounces_1m = get_faded_bounces(deltas, window="1m", limit=limit)
+
+    # Current Strength leaderboard — топ 50 акции по абсолютна 12-1 momentum
+    current_strength = (
+        deltas.dropna(subset=["abs_strength"])
+        .sort_values("abs_strength", ascending=False)
+        .head(50)
+    )
 
     sector_agg = aggregate_by_sector(deltas, sectors)
     sub_industry_agg = aggregate_by_sub_industry(deltas, sectors)
@@ -115,7 +151,7 @@ def render_dashboard_data(
             return []
         out = []
         for _, row in df.iterrows():
-            d = _row_to_dict(row, sectors)
+            d = _row_to_dict(row, sectors, returns=returns)
             d["trajectory"] = _trajectory(history, row["ticker"])
             out.append(d)
         return out
@@ -145,6 +181,7 @@ def render_dashboard_data(
         "quality_dip_1m": _with_trajectory(quality_dip_1m),
         "quality_dip_3m": _with_trajectory(quality_dip_3m),
         "faded_bounces_1m": _with_trajectory(faded_bounces_1m),
+        "current_strength": _with_trajectory(current_strength),
         "sector_rotation": [
             {
                 "sector": row["gics_sector"],
@@ -184,5 +221,6 @@ if __name__ == "__main__":
     print(f"  Quality Dip 1m: {len(payload['quality_dip_1m'])}")
     print(f"  Quality Dip 3m: {len(payload['quality_dip_3m'])}")
     print(f"  Faded Bounces (warning): {len(payload['faded_bounces_1m'])}")
+    print(f"  Current Strength: {len(payload['current_strength'])}")
     print(f"  Sectors: {len(payload['sector_rotation'])}")
     print(f"  Sub-industries: {len(payload['sub_industry_rotation'])}")

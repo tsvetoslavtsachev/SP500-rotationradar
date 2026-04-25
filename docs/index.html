@@ -28,6 +28,7 @@
   <button class="tab" data-tab="quality-dip-1m">💎 Quality Dip (1m)</button>
   <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
   <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
+  <button class="tab" data-tab="current-strength">📈 Current Strength</button>
   <button class="tab" data-tab="sectors">🌡 Sector Heatmap</button>
   <button class="tab" data-tab="sub-industries">🔬 Sub-Industries</button>
 </nav>
@@ -77,6 +78,18 @@
     <div class="table-host"></div>
   </section>
 
+  <section id="current-strength" class="view">
+    <h2>📈 Current Strength — Топ 50 по абсолютен 12-1 momentum</h2>
+    <p class="view-desc">
+      Класически "current strength view" от старото SP500-momentumrank — топ 50 акции
+      по <strong>абсолютна 11-месечна доходност</strong> (Jegadeesh-Titman 12-1, skip последния месец).
+      Колоната <strong>"12-1 Mom %"</strong> показва реалната доходност, не percentile.
+      Полезно за cross-check: ако даден Stable Winner или Quality Dip кандидат не е в този списък,
+      означава че е sector-relative силен но абсолютно умерен.
+    </p>
+    <div class="table-host"></div>
+  </section>
+
   <section id="sectors" class="view">
     <h2>🌡 Sector Rotation Heatmap</h2>
     <p class="view-desc">
@@ -97,6 +110,14 @@
   <p>
     Скоринг: pure 12-1 momentum + GICS-sector-relative z-score • Прагове: p20/p80 • Refresh: daily
     <br>
+    <strong>Колони:</strong>
+    <em>Sector Rank</em> = sector-relative z-score percentile (главният сигнал) •
+    <em>Abs %ile</em> = absolute 12-1 momentum percentile (cross-check) •
+    <em>12-1 Mom %</em> = действителна 11-месечна доходност (skip последния месец) •
+    <em>Base (6m)</em> = средна Sector Rank за месеци 6-1 назад •
+    <em>Δ 1m / 3m</em> = промяна на Sector Rank спрямо преди 21/63 търговски дни •
+    <em>Trajectory</em> = последните 90 търговски дни (~4 месеца) на Sector Rank, не доходността
+    <br><br>
     <strong>Не е инвестиционен съвет.</strong> Инструмент за research starting points, не за директно търгуване.
     Survivorship bias caveat: backtest резултатите са оптимистично-биасирани (текущ SP500 universe).
   </p>
