@@ -262,7 +262,8 @@ body.screener-mode #screener.view {
 .screener-table-host table {
   width: 100%;
   min-width: 2400px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: auto;
   font-variant-numeric: tabular-nums;
   background: transparent;
