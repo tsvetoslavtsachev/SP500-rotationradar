@@ -345,6 +345,7 @@ body.screener-mode .screener-table-host {
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
+  table-layout: fixed;
 }
 
 .screener-split th {
@@ -352,7 +353,12 @@ body.screener-mode .screener-table-host {
   top: 0;
   z-index: 10;
   background: var(--bg-elev-2);
-  height: 32px;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 8px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-shadow: 0 1px 0 var(--border);
 }
 
@@ -360,7 +366,9 @@ body.screener-mode .screener-table-host {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   background: var(--bg-elev);
+  box-sizing: border-box;
   height: 32px;
+  padding: 6px 10px;
   border-bottom: 1px solid var(--border);
 }
 
