@@ -188,18 +188,73 @@ tr:hover { background: var(--bg-elev-2); }
   border-radius: 6px;
 }
 
-/* Screener — full viewport width breakout */
-#screener.view {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  margin-left: -50vw;
-  padding: 0 24px;
-  box-sizing: border-box;
+/* Screener — fullscreen mode когато tab-ът е активен.
+   body.screener-mode се toggle-ва от app.js при tab change. */
+body.screener-mode {
+  max-width: none;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 24px;
+  margin: 0;
+}
+
+body.screener-mode header {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+body.screener-mode .tagline,
+body.screener-mode .tagline small,
+body.screener-mode footer {
+  display: none;
+}
+
+body.screener-mode .metadata {
+  margin-top: 4px;
+}
+
+body.screener-mode .tabs {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+body.screener-mode main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body.screener-mode #screener.view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.screener-mode #screener.view h2 {
+  flex-shrink: 0;
+  margin-bottom: 6px;
+}
+
+body.screener-mode #screener.view .view-desc {
+  display: none;
+}
+
+body.screener-mode .screener-controls {
+  flex-shrink: 0;
+}
+
+body.screener-mode .screener-table-host {
+  flex: 1;
+  max-height: none;
 }
 
 @media (max-width: 768px) {
-  #screener.view { padding: 0 12px; }
+  body.screener-mode { padding: 8px 12px; }
 }
 
 /* Screener controls */

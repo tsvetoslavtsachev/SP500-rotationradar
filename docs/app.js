@@ -529,6 +529,10 @@ function setupTabs() {
       const target = btn.dataset.tab;
       document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
       document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === target));
+      // Screener tab gets fullscreen mode (sticky headers + frozen left cols rely on
+      // a properly sized scroll container; without screener-mode the page-level
+      // scroll takes over and sticky positioning becomes inconsistent).
+      document.body.classList.toggle("screener-mode", target === "screener");
     });
   });
 }
