@@ -12,6 +12,7 @@
   renderWatchlist("quality-dip-3m", data.quality_dip_3m, "3m");
   renderWatchlist("faded-bounces", data.faded_bounces_1m, "1m");
   renderCurrentStrength("current-strength", data.current_strength);
+  renderScreener("screener", data.screener);
   renderHeatmap("sectors", data.sector_rotation);
   renderSubIndustryTable("sub-industries", data.sub_industry_rotation);
   setupTabs();
@@ -334,6 +335,147 @@ function renderSubIndustryTable(viewId, subs) {
   table.appendChild(tbody);
   host.replaceChildren(table);
   attachSorting(table, headers);
+}
+
+function renderScreener(viewId, screenerData) {
+  const host = document.querySelector(`#${viewId} .screener-table-host`);
+  const sectorSelect = document.getElementById("screener-sector");
+  const sizeSelect = document.getElementById("screener-size");
+  const searchInput = document.getElementById("screener-search");
+  const countPill = document.getElementById("screener-count");
+
+  if (!screenerData || !screenerData.stocks || screenerData.stocks.length === 0) {
+    host.innerHTML = `<div class="empty-state">Няма screener данни.</div>`;
+    return;
+  }
+
+  const stocks = screenerData.stocks;
+
+  // Populate sector dropdown
+  const sectors = Array.from(new Set(stocks.map((s) => s.sector).filter(Boolean))).sort();
+  sectors.forEach((s) => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    sectorSelect.appendChild(opt);
+  });
+
+  const headers = [
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "industry", label: "Sub-Industry" },
+    { key: "market_cap_m", label: "Mcap (M$)" },
+    { key: "size_bucket", label: "Size" },
+    { key: "ret_1m", label: "1M %" },
+    { key: "ret_3m", label: "3M %" },
+    { key: "ret_6m", label: "6M %" },
+    { key: "ret_ytd", label: "YTD %" },
+    { key: "ret_1y", label: "1Y %" },
+    { key: "ret_3y", label: "3Y %" },
+    { key: "ret_5y", label: "5Y %" },
+    { key: "vol_1y", label: "Vol 1Y %" },
+    { key: "sharpe_1y", label: "Sharpe 1Y" },
+    { key: "sharpe_3y", label: "Sharpe 3Y" },
+    { key: "maxdd_1y", label: "MaxDD 1Y %" },
+    { key: "maxdd_3y", label: "MaxDD 3Y %" },
+    { key: "maxdd_5y", label: "MaxDD 5Y %" },
+    { key: "calmar_3y", label: "Calmar 3Y" },
+    { key: "dist_52w_high", label: "from 52w-H %" },
+    { key: "days_since_52w_high", label: "Days since H" },
+    { key: "beta_1y", label: "Beta 1Y" },
+  ];
+
+  function applyFilters() {
+    const sector = sectorSelect.value;
+    const size = sizeSelect.value;
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = stocks.filter((s) => {
+      if (sector && s.sector !== sector) return false;
+      if (size && s.size_bucket !== size) return false;
+      if (query) {
+        const t = (s.ticker || "").toLowerCase();
+        const n = (s.name || "").toLowerCase();
+        if (!t.includes(query) && !n.includes(query)) return false;
+      }
+      return true;
+    });
+
+    countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
+    renderTable(filtered);
+  }
+
+  function fmtCell(td, key, value) {
+    if (value === null || value === undefined) {
+      td.textContent = "—";
+      td.dataset.value = "";
+      return;
+    }
+    if (key === "ticker") {
+      td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${value}" target="_blank" rel="noopener">${value}</a>`;
+      td.dataset.value = value;
+      return;
+    }
+    if (key === "market_cap_m") {
+      const billions = value / 1000;
+      td.textContent = billions >= 100 ? `${billions.toFixed(0)}B` : `${billions.toFixed(1)}B`;
+      td.dataset.value = value;
+      return;
+    }
+    if (typeof value === "number") {
+      const isReturnLike = key.startsWith("ret_") || key.startsWith("maxdd_") || key === "dist_52w_high";
+      if (isReturnLike) {
+        td.textContent = (value > 0 ? "+" : "") + value.toFixed(1) + "%";
+        td.className = value > 0 ? "delta-positive" : value < 0 ? "delta-negative" : "";
+      } else if (key.startsWith("vol_")) {
+        td.textContent = value.toFixed(1) + "%";
+      } else if (key === "days_since_52w_high") {
+        td.textContent = Math.round(value);
+      } else {
+        td.textContent = value.toFixed(2);
+      }
+      td.dataset.value = value;
+      return;
+    }
+    td.textContent = value;
+    td.dataset.value = value;
+  }
+
+  function renderTable(rows) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const trh = document.createElement("tr");
+    headers.forEach((h, idx) => {
+      const th = document.createElement("th");
+      th.textContent = h.label;
+      th.dataset.col = idx;
+      th.dataset.key = h.key;
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      headers.forEach((h) => {
+        const td = document.createElement("td");
+        fmtCell(td, h.key, row[h.key]);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    host.replaceChildren(table);
+    attachSorting(table, headers);
+  }
+
+  sectorSelect.addEventListener("change", applyFilters);
+  sizeSelect.addEventListener("change", applyFilters);
+  searchInput.addEventListener("input", applyFilters);
+
+  applyFilters();
 }
 
 function heatColor(value, maxAbs) {

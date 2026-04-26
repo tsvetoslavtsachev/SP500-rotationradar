@@ -29,6 +29,7 @@
   <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
   <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
   <button class="tab" data-tab="current-strength">📈 Current Strength</button>
+  <button class="tab" data-tab="screener">📊 Universe Screener</button>
   <button class="tab" data-tab="sectors">🌡 Sector Heatmap</button>
   <button class="tab" data-tab="sub-industries">🔬 Sub-Industries</button>
 </nav>
@@ -88,6 +89,33 @@
       означава че е sector-relative силен но абсолютно умерен.
     </p>
     <div class="table-host"></div>
+  </section>
+
+  <section id="screener" class="view">
+    <h2>📊 Universe Screener — пълна таблица с всички акции</h2>
+    <p class="view-desc">
+      Всички 500+ SP500 акции, със сортиране по сектор, размер, доходност, риск, drawdown, beta.
+      Метриките са изчислени от 6-годишна история на дневните цени. Колоните: размер (Large/Mid/Small),
+      доходност за 1M/3M/6M/YTD/1Y/3Y/5Y, годишна vol, Sharpe, max drawdown, разстояние от 52-седмичния връх и beta.
+    </p>
+    <div class="screener-controls">
+      <label>Сектор:
+        <select id="screener-sector"><option value="">Всички</option></select>
+      </label>
+      <label>Размер:
+        <select id="screener-size">
+          <option value="">Всички</option>
+          <option value="Large">Large (>$50B)</option>
+          <option value="Mid">Mid ($10-50B)</option>
+          <option value="Small">Small (<$10B)</option>
+        </select>
+      </label>
+      <label>Търсене:
+        <input id="screener-search" type="text" placeholder="ticker или име..." />
+      </label>
+      <span id="screener-count" class="count-pill"></span>
+    </div>
+    <div class="table-host screener-table-host"></div>
   </section>
 
   <section id="sectors" class="view">

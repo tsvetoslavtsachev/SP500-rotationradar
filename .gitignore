@@ -6,9 +6,6 @@ __pycache__/
 venv/
 .env
 
-# Local-only: prices cache може да е голям, не пазим в repo
-data/prices_cache.parquet
-
 # Backtest artifacts (regenerable)
 data/backtest_results.parquet
 data/backtest_v2_results.parquet

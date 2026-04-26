@@ -11,6 +11,7 @@ Daily orchestrator — изпълнява се от GitHub Actions всеки de
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -35,13 +36,42 @@ def load_sector_map_for_scoring(cache_path: Path) -> dict[str, str]:
     df = get_sector_dataframe(cache_path)
     return dict(zip(df["ticker"], df["gics_sector"]))
 
+
+def is_market_cap_cache_stale(path: Path = MARKET_CAPS_PATH, max_age_days: int = MARKET_CAP_REFRESH_DAYS) -> bool:
+    """Връща True ако market_caps.json липсва или е по-стар от max_age_days."""
+    if not path.exists():
+        return True
+    try:
+        with path.open(encoding="utf-8") as f:
+            cache = json.load(f)
+        updated = cache.get("updated")
+        if not updated:
+            return True
+        from datetime import datetime, timedelta
+        updated_dt = datetime.fromisoformat(updated)
+        return datetime.now() - updated_dt > timedelta(days=max_age_days)
+    except Exception:
+        return True
+
+
+def maybe_refresh_market_caps() -> None:
+    """Ако market caps cache е stale, refresh."""
+    if not is_market_cap_cache_stale():
+        return
+    print("  Market caps cache stale → refreshing (this may take ~1-2 minutes)...")
+    from scripts.fetch_market_caps import fetch_all, save
+    caps = fetch_all()
+    save(caps)
+
 DATA_DIR = ROOT / "data"
 HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
 PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
 SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
+MARKET_CAPS_PATH = DATA_DIR / "market_caps.json"
 
-# За daily run-a имаме нужда само от последните ~13 месеца (252 + малко буфер)
-LOOKBACK_DAYS_FOR_SCORING = 280
+# За screener-а ни трябват 5 години → пазим минимум 6 години
+LOOKBACK_DAYS_FOR_SCORING = 1500
+MARKET_CAP_REFRESH_DAYS = 7
 
 
 def update_prices_cache(tickers: list[str]) -> pd.DataFrame:
@@ -115,7 +145,8 @@ def main() -> None:
     size_mb = HISTORY_PATH.stat().st_size / 1e6
     print(f"      History now {size_mb:.1f} MB")
 
-    print("[5/5] Rendering data.json...")
+    print("[5/5] Rendering data.json (incl. market cap refresh check + screener)...")
+    maybe_refresh_market_caps()
     payload = render_dashboard_data()
     print(f"      Rendered: as of {payload['metadata']['as_of']}")
     print(
@@ -125,6 +156,7 @@ def main() -> None:
     )
     print(
         f"      Current Strength: {len(payload['current_strength'])} | "
+        f"Screener: {len(payload['screener']['stocks'])} | "
         f"Sectors: {len(payload['sector_rotation'])}"
     )
 

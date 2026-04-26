@@ -188,6 +188,73 @@ tr:hover { background: var(--bg-elev-2); }
   border-radius: 6px;
 }
 
+/* Screener controls */
+.screener-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: var(--bg-elev);
+  border-radius: 6px;
+}
+
+.screener-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.screener-controls select,
+.screener-controls input {
+  background: var(--bg-elev-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  min-width: 180px;
+}
+
+.screener-controls input:focus,
+.screener-controls select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.count-pill {
+  margin-left: auto;
+  background: var(--bg-elev-2);
+  color: var(--text-dim);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.screener-table-host {
+  overflow-x: auto;
+  max-height: 70vh;
+}
+
+.screener-table-host table {
+  font-size: 12px;
+}
+
+.screener-table-host th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.screener-table-host td {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Heatmap */
 .heatmap {
   display: grid;

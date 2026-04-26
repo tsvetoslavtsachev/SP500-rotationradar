@@ -26,6 +26,7 @@ from src.rank_history import (  # noqa: E402
     get_stable_winners,
     load_history,
 )
+from src.screener import build_screener  # noqa: E402
 from src.sector_engine import (  # noqa: E402
     aggregate_by_sector,
     aggregate_by_sub_industry,
@@ -38,8 +39,61 @@ DOCS_DIR = ROOT / "docs"
 HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
 PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
 SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
+MARKET_CAPS_PATH = DATA_DIR / "market_caps.json"
 OUTPUT_PATH = DOCS_DIR / "data.json"
 TRAJECTORY_DAYS = 90
+
+
+def load_market_caps(path: Path = MARKET_CAPS_PATH) -> tuple[dict[str, float], str | None]:
+    """Зарежда cached market caps. Връща (mapping, updated_iso_string)."""
+    if not path.exists():
+        return {}, None
+    with path.open(encoding="utf-8") as f:
+        cache = json.load(f)
+    return cache.get("tickers", {}), cache.get("updated")
+
+
+def build_screener_payload() -> tuple[list[dict], str | None]:
+    """Изгражда screener секцията: списък с stock dicts + market_cap_updated timestamp."""
+    if not PRICES_CACHE_PATH.exists():
+        return [], None
+
+    prices = pd.read_parquet(PRICES_CACHE_PATH)
+    prices.index = pd.to_datetime(prices.index)
+
+    sectors = get_sector_dataframe(SECTOR_CACHE_PATH)
+    sector_map = dict(zip(sectors["ticker"], sectors["gics_sector"]))
+    industry_map = dict(zip(sectors["ticker"], sectors["gics_sub_industry"]))
+    name_map = dict(zip(sectors["ticker"], sectors["name"]))
+
+    market_caps, mcap_updated = load_market_caps()
+
+    df = build_screener(
+        prices,
+        sector_map=sector_map,
+        industry_map=industry_map,
+        name_map=name_map,
+        market_caps=market_caps,
+    )
+
+    # Форматиране: round до 2 знака за всички floats, None за NaN
+    def _safe(v, ndigits=2):
+        if v is None or (isinstance(v, float) and not np.isfinite(v)):
+            return None
+        if isinstance(v, float):
+            return round(v, ndigits)
+        return v
+
+    stocks = []
+    for _, row in df.iterrows():
+        record = {col: _safe(row[col]) for col in df.columns}
+        # market_cap е голямо число; по-добре в милиони USD за компактност
+        if record.get("market_cap"):
+            record["market_cap_m"] = round(record["market_cap"] / 1e6)
+            del record["market_cap"]
+        stocks.append(record)
+
+    return stocks, mcap_updated
 
 
 def compute_current_returns(prices_cache_path: Path = PRICES_CACHE_PATH) -> dict[str, float]:
@@ -146,6 +200,8 @@ def render_dashboard_data(
     sector_agg = aggregate_by_sector(deltas, sectors)
     sub_industry_agg = aggregate_by_sub_industry(deltas, sectors)
 
+    screener_stocks, mcap_updated = build_screener_payload()
+
     def _with_trajectory(df: pd.DataFrame) -> list:
         if df.empty:
             return []
@@ -182,6 +238,11 @@ def render_dashboard_data(
         "quality_dip_3m": _with_trajectory(quality_dip_3m),
         "faded_bounces_1m": _with_trajectory(faded_bounces_1m),
         "current_strength": _with_trajectory(current_strength),
+        "screener": {
+            "as_of": as_of.strftime("%Y-%m-%d"),
+            "market_cap_updated": mcap_updated,
+            "stocks": screener_stocks,
+        },
         "sector_rotation": [
             {
                 "sector": row["gics_sector"],
@@ -222,5 +283,6 @@ if __name__ == "__main__":
     print(f"  Quality Dip 3m: {len(payload['quality_dip_3m'])}")
     print(f"  Faded Bounces (warning): {len(payload['faded_bounces_1m'])}")
     print(f"  Current Strength: {len(payload['current_strength'])}")
+    print(f"  Screener stocks: {len(payload['screener']['stocks'])}")
     print(f"  Sectors: {len(payload['sector_rotation'])}")
     print(f"  Sub-industries: {len(payload['sub_industry_rotation'])}")
