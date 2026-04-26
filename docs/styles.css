@@ -308,62 +308,73 @@ body.screener-mode .screener-table-host {
 }
 
 .screener-table-host {
-  overflow: auto;
   max-height: 75vh;
   border: 1px solid var(--border);
   border-radius: 6px;
+  overflow: hidden;
 }
 
-.screener-table-host table {
+/* Split panes: frozen left (Ticker + Name) + scrollable right (everything else) */
+.screener-split {
+  display: flex;
+  height: 100%;
+  max-height: 75vh;
+  overflow: hidden;
+}
+
+.screener-frozen-pane {
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 2px solid var(--accent);
+  scrollbar-width: none;  /* Firefox */
+}
+
+.screener-frozen-pane::-webkit-scrollbar {
+  display: none;  /* Chrome/Safari */
+}
+
+.screener-scroll-pane {
+  flex: 1;
+  overflow: auto;
+  min-width: 0;
+}
+
+.screener-split table {
   font-size: 12px;
   border-collapse: separate;
   border-spacing: 0;
+  width: 100%;
 }
 
-.screener-table-host th {
+.screener-split th {
   position: sticky;
   top: 0;
   z-index: 10;
   background: var(--bg-elev-2);
+  height: 32px;
+  box-shadow: 0 1px 0 var(--border);
 }
 
-.screener-table-host td {
+.screener-split td {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   background: var(--bg-elev);
+  height: 32px;
+  border-bottom: 1px solid var(--border);
 }
 
-/* Frozen first 2 columns: Ticker + Name */
-.screener-table-host th:nth-child(1),
-.screener-table-host td:nth-child(1) {
-  position: sticky;
-  left: 0;
-  width: 80px;
-  min-width: 80px;
-  max-width: 80px;
-  z-index: 5;
-  border-right: 1px solid var(--border);
-}
+.screener-split tr:hover td { background: var(--bg-elev-2); }
 
-.screener-table-host th:nth-child(2),
-.screener-table-host td:nth-child(2) {
-  position: sticky;
-  left: 80px;
+/* Frozen pane column widths */
+.screener-frozen-pane .col-ticker { width: 80px; min-width: 80px; max-width: 80px; }
+.screener-frozen-pane .col-name {
   width: 220px;
   min-width: 220px;
   max-width: 220px;
-  z-index: 4;
-  border-right: 1px solid var(--border);
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* Corner cells (sticky top + sticky left) need higher z-index */
-.screener-table-host th:nth-child(1) { z-index: 15; }
-.screener-table-host th:nth-child(2) { z-index: 14; }
-
-/* Hover state preserves sticky background */
-.screener-table-host tr:hover td { background: var(--bg-elev-2); }
 
 /* Heatmap */
 .heatmap {

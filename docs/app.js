@@ -351,7 +351,6 @@ function renderScreener(viewId, screenerData) {
 
   const stocks = screenerData.stocks;
 
-  // Populate sector dropdown
   const sectors = Array.from(new Set(stocks.map((s) => s.sector).filter(Boolean))).sort();
   sectors.forEach((s) => {
     const opt = document.createElement("option");
@@ -360,12 +359,14 @@ function renderScreener(viewId, screenerData) {
     sectorSelect.appendChild(opt);
   });
 
-  const headers = [
-    { key: "ticker", label: "Ticker" },
-    { key: "name", label: "Name" },
+  const frozenHeaders = [
+    { key: "ticker", label: "Ticker", cls: "col-ticker" },
+    { key: "name", label: "Name", cls: "col-name" },
+  ];
+  const scrollHeaders = [
     { key: "sector", label: "Sector" },
     { key: "industry", label: "Sub-Industry" },
-    { key: "market_cap_m", label: "Mcap (M$)" },
+    { key: "market_cap_m", label: "Mcap" },
     { key: "size_bucket", label: "Size" },
     { key: "ret_1m", label: "1M %" },
     { key: "ret_3m", label: "3M %" },
@@ -385,26 +386,7 @@ function renderScreener(viewId, screenerData) {
     { key: "days_since_52w_high", label: "Days since H" },
     { key: "beta_1y", label: "Beta 1Y" },
   ];
-
-  function applyFilters() {
-    const sector = sectorSelect.value;
-    const size = sizeSelect.value;
-    const query = searchInput.value.trim().toLowerCase();
-
-    const filtered = stocks.filter((s) => {
-      if (sector && s.sector !== sector) return false;
-      if (size && s.size_bucket !== size) return false;
-      if (query) {
-        const t = (s.ticker || "").toLowerCase();
-        const n = (s.name || "").toLowerCase();
-        if (!t.includes(query) && !n.includes(query)) return false;
-      }
-      return true;
-    });
-
-    countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
-    renderTable(filtered);
-  }
+  const allHeaders = [...frozenHeaders, ...scrollHeaders];
 
   function fmtCell(td, key, value) {
     if (value === null || value === undefined) {
@@ -442,7 +424,7 @@ function renderScreener(viewId, screenerData) {
     td.dataset.value = value;
   }
 
-  function renderTable(rows) {
+  function buildPane(headers, rows) {
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const trh = document.createElement("tr");
@@ -451,6 +433,7 @@ function renderScreener(viewId, screenerData) {
       th.textContent = h.label;
       th.dataset.col = idx;
       th.dataset.key = h.key;
+      if (h.cls) th.classList.add(h.cls);
       trh.appendChild(th);
     });
     thead.appendChild(trh);
@@ -461,14 +444,118 @@ function renderScreener(viewId, screenerData) {
       const tr = document.createElement("tr");
       headers.forEach((h) => {
         const td = document.createElement("td");
+        if (h.cls) td.classList.add(h.cls);
         fmtCell(td, h.key, row[h.key]);
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
-    host.replaceChildren(table);
-    attachSorting(table, headers);
+    return table;
+  }
+
+  function applyFilters() {
+    const sector = sectorSelect.value;
+    const size = sizeSelect.value;
+    const query = searchInput.value.trim().toLowerCase();
+
+    let filtered = stocks.filter((s) => {
+      if (sector && s.sector !== sector) return false;
+      if (size && s.size_bucket !== size) return false;
+      if (query) {
+        const t = (s.ticker || "").toLowerCase();
+        const n = (s.name || "").toLowerCase();
+        if (!t.includes(query) && !n.includes(query)) return false;
+      }
+      return true;
+    });
+
+    // Прилагаме текущия sort state ако има
+    if (currentSort.key) {
+      const k = currentSort.key;
+      const dir = currentSort.desc ? -1 : 1;
+      filtered = [...filtered].sort((a, b) => {
+        const va = a[k];
+        const vb = b[k];
+        if (va === null || va === undefined) return 1;
+        if (vb === null || vb === undefined) return -1;
+        if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+        return String(va).localeCompare(String(vb)) * dir;
+      });
+    }
+
+    countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
+    renderSplit(filtered);
+  }
+
+  let currentSort = { key: null, desc: true };
+
+  function attachSplitSorting(frozenTable, scrollTable) {
+    const allTh = [
+      ...frozenTable.querySelectorAll("thead th"),
+      ...scrollTable.querySelectorAll("thead th"),
+    ];
+    allTh.forEach((th) => {
+      th.style.cursor = "pointer";
+      th.addEventListener("click", () => {
+        const key = th.dataset.key;
+        currentSort.desc = !(currentSort.key === key && currentSort.desc);
+        currentSort.key = key;
+        allTh.forEach((x) => x.classList.remove("sort-asc", "sort-desc"));
+        th.classList.add(currentSort.desc ? "sort-desc" : "sort-asc");
+        applyFilters();
+      });
+    });
+  }
+
+  function renderSplit(rows) {
+    host.innerHTML = "";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "screener-split";
+
+    const frozenPane = document.createElement("div");
+    frozenPane.className = "screener-frozen-pane";
+    const scrollPane = document.createElement("div");
+    scrollPane.className = "screener-scroll-pane";
+
+    const frozenTable = buildPane(frozenHeaders, rows);
+    const scrollTable = buildPane(scrollHeaders, rows);
+    frozenPane.appendChild(frozenTable);
+    scrollPane.appendChild(scrollTable);
+
+    wrapper.appendChild(frozenPane);
+    wrapper.appendChild(scrollPane);
+    host.appendChild(wrapper);
+
+    // Sync vertical scroll: scroll pane drives, frozen pane mirrors
+    let syncing = false;
+    scrollPane.addEventListener("scroll", () => {
+      if (syncing) return;
+      syncing = true;
+      frozenPane.scrollTop = scrollPane.scrollTop;
+      requestAnimationFrame(() => { syncing = false; });
+    });
+    frozenPane.addEventListener("wheel", (e) => {
+      // Forward wheel events on frozen pane to scroll pane
+      scrollPane.scrollTop += e.deltaY;
+      e.preventDefault();
+    }, { passive: false });
+
+    attachSplitSorting(frozenTable, scrollTable);
+
+    // Restore sort indicator
+    if (currentSort.key) {
+      const all = [
+        ...frozenTable.querySelectorAll("thead th"),
+        ...scrollTable.querySelectorAll("thead th"),
+      ];
+      all.forEach((th) => {
+        if (th.dataset.key === currentSort.key) {
+          th.classList.add(currentSort.desc ? "sort-desc" : "sort-asc");
+        }
+      });
+    }
   }
 
   sectorSelect.addEventListener("change", applyFilters);
