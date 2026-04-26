@@ -12,6 +12,7 @@
   renderWatchlist("quality-dip-3m", data.quality_dip_3m, "3m");
   renderWatchlist("faded-bounces", data.faded_bounces_1m, "1m");
   renderCurrentStrength("current-strength", data.current_strength);
+  renderRankAll("rank-all", data.rank_all_stocks);
   renderScreener("screener", data.screener);
   renderHeatmap("sectors", data.sector_rotation);
   renderSubIndustryTable("sub-industries", data.sub_industry_rotation);
@@ -337,6 +338,172 @@ function renderSubIndustryTable(viewId, subs) {
   attachSorting(table, headers);
 }
 
+function renderRankAll(viewId, stocks) {
+  const host = document.getElementById("rank-table-host");
+  const sectorSelect = document.getElementById("rank-sector");
+  const quadrantSelect = document.getElementById("rank-quadrant");
+  const searchInput = document.getElementById("rank-search");
+  const countPill = document.getElementById("rank-count");
+
+  if (!stocks || stocks.length === 0) {
+    host.innerHTML = `<div class="empty-state">Няма rank данни.</div>`;
+    return;
+  }
+
+  const sectors = Array.from(new Set(stocks.map((s) => s.sector).filter(Boolean))).sort();
+  sectors.forEach((s) => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    sectorSelect.appendChild(opt);
+  });
+
+  const headers = [
+    { key: "rank_position", label: "#" },
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "sub_industry", label: "Sub-Industry" },
+    { key: "score", label: "Score" },
+    { key: "abs_strength", label: "Abs %ile" },
+    { key: "mom_12_1_pct", label: "12-1 Mom %" },
+    { key: "base_rank_6m", label: "Base (6m)" },
+    { key: "delta_1m", label: "Δ 1m" },
+    { key: "delta_3m", label: "Δ 3m" },
+    { key: "quadrant_1m", label: "Quad 1m" },
+    { key: "quadrant_3m", label: "Quad 3m" },
+  ];
+
+  let currentSort = { key: "rank_position", desc: false };
+
+  function fmtCell(td, key, value) {
+    if (value === null || value === undefined) {
+      td.textContent = "—";
+      td.dataset.value = "";
+      return;
+    }
+    if (key === "ticker") {
+      td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${value}" target="_blank" rel="noopener">${value}</a>`;
+      td.dataset.value = value;
+      return;
+    }
+    if (key === "rank_position") {
+      td.textContent = value;
+      td.dataset.value = value;
+      td.style.fontWeight = "600";
+      td.style.color = "var(--text-dim)";
+      return;
+    }
+    if (key === "mom_12_1_pct") {
+      td.textContent = (value > 0 ? "+" : "") + value.toFixed(1) + "%";
+      td.className = value > 0 ? "delta-positive" : value < 0 ? "delta-negative" : "";
+      td.dataset.value = value;
+      return;
+    }
+    if (key === "delta_1m" || key === "delta_3m") {
+      td.textContent = (value > 0 ? "+" : "") + value.toFixed(1);
+      td.className = value > 0 ? "delta-positive" : value < 0 ? "delta-negative" : "";
+      td.dataset.value = value;
+      return;
+    }
+    if (key === "quadrant_1m" || key === "quadrant_3m") {
+      const cls = {
+        "Stable Winner": "quadrant-stable_winner",
+        "Quality Dip": "quadrant-decayer",
+        "Faded Bounce": "quadrant-riser",
+        "Chronic Loser": "quadrant-chronic_loser",
+        "Neutral": "quadrant-neutral",
+      }[value] || "quadrant-neutral";
+      td.innerHTML = `<span class="quadrant ${cls}">${value}</span>`;
+      td.dataset.value = value;
+      return;
+    }
+    if (typeof value === "number") {
+      td.textContent = value.toFixed(1);
+      td.dataset.value = value;
+      return;
+    }
+    td.textContent = value;
+    td.dataset.value = value;
+  }
+
+  function applyFilters() {
+    const sector = sectorSelect.value;
+    const quadrant = quadrantSelect.value;
+    const query = searchInput.value.trim().toLowerCase();
+
+    let filtered = stocks.filter((s) => {
+      if (sector && s.sector !== sector) return false;
+      if (quadrant && s.quadrant_1m !== quadrant) return false;
+      if (query) {
+        const t = (s.ticker || "").toLowerCase();
+        const n = (s.name || "").toLowerCase();
+        if (!t.includes(query) && !n.includes(query)) return false;
+      }
+      return true;
+    });
+
+    if (currentSort.key) {
+      const k = currentSort.key;
+      const dir = currentSort.desc ? -1 : 1;
+      filtered = [...filtered].sort((a, b) => {
+        const va = a[k];
+        const vb = b[k];
+        if (va === null || va === undefined) return 1;
+        if (vb === null || vb === undefined) return -1;
+        if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+        return String(va).localeCompare(String(vb)) * dir;
+      });
+    }
+
+    countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
+    renderTable(filtered);
+  }
+
+  function renderTable(rows) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const trh = document.createElement("tr");
+    headers.forEach((h, idx) => {
+      const th = document.createElement("th");
+      th.textContent = h.label;
+      th.dataset.col = idx;
+      th.dataset.key = h.key;
+      if (currentSort.key === h.key) {
+        th.classList.add(currentSort.desc ? "sort-desc" : "sort-asc");
+      }
+      th.addEventListener("click", () => {
+        currentSort.desc = !(currentSort.key === h.key && currentSort.desc);
+        currentSort.key = h.key;
+        applyFilters();
+      });
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      headers.forEach((h) => {
+        const td = document.createElement("td");
+        fmtCell(td, h.key, row[h.key]);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    host.replaceChildren(table);
+  }
+
+  sectorSelect.addEventListener("change", applyFilters);
+  quadrantSelect.addEventListener("change", applyFilters);
+  searchInput.addEventListener("input", applyFilters);
+
+  applyFilters();
+}
+
 function renderScreener(viewId, screenerData) {
   const host = document.querySelector(`#${viewId} .screener-table-host`);
   const sectorSelect = document.getElementById("screener-sector");
@@ -554,10 +721,11 @@ function setupTabs() {
       const target = btn.dataset.tab;
       document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
       document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === target));
-      // Screener получава full-width body (max-width: none) за повече място;
-      // sticky thead работи защото .screener-table-host е overflow:auto с
-      // фиксирана височина (75vh) — page-level scroll не е необходим.
-      document.body.classList.toggle("screener-mode", target === "screener");
+      // Full-width body (max-width: none) за tabs с пълни таблици — повече място
+      // за хоризонтална таблица. Sticky thead работи защото table-host е
+      // overflow:auto с фиксирана височина (75vh).
+      const fullTableTabs = ["screener", "rank-all"];
+      document.body.classList.toggle("screener-mode", fullTableTabs.includes(target));
     });
   });
 }

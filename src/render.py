@@ -202,6 +202,53 @@ def render_dashboard_data(
 
     screener_stocks, mcap_updated = build_screener_payload()
 
+    # Rank All Stocks — пълно подреждане по Score (sector-relative percentile).
+    # Score е V2 еквивалент на старото "weighted_return / vol + 0.3*sharpe".
+    rank_all_df = (
+        deltas.dropna(subset=["current_rank"])
+        .sort_values("current_rank", ascending=False)
+        .reset_index(drop=True)
+    )
+    rank_all_df["rank_position"] = rank_all_df.index + 1
+
+    quadrant_label = {
+        "riser": "Faded Bounce",
+        "decayer": "Quality Dip",
+        "stable_winner": "Stable Winner",
+        "chronic_loser": "Chronic Loser",
+        "neutral": "Neutral",
+        "unknown": "—",
+    }
+
+    rank_all_payload = []
+    for _, row in rank_all_df.iterrows():
+        ticker = row["ticker"]
+        sector_info = sectors[sectors["ticker"] == ticker]
+        if sector_info.empty:
+            name = sector = sub = None
+        else:
+            s = sector_info.iloc[0]
+            name = _safe_str(s.get("name"))
+            sector = _safe_str(s.get("gics_sector"))
+            sub = _safe_str(s.get("gics_sub_industry"))
+
+        mom = returns.get(ticker)
+        rank_all_payload.append({
+            "rank_position": int(row["rank_position"]),
+            "ticker": ticker,
+            "name": name,
+            "sector": sector,
+            "sub_industry": sub,
+            "score": _safe_round(row.get("current_rank")),
+            "abs_strength": _safe_round(row.get("abs_strength")),
+            "mom_12_1_pct": round(mom * 100, 1) if mom is not None else None,
+            "base_rank_6m": _safe_round(row.get("base_rank_6m")),
+            "delta_1m": _safe_round(row.get("delta_1m")),
+            "delta_3m": _safe_round(row.get("delta_3m")),
+            "quadrant_1m": quadrant_label.get(row.get("quadrant_1m"), "—"),
+            "quadrant_3m": quadrant_label.get(row.get("quadrant_3m"), "—"),
+        })
+
     def _with_trajectory(df: pd.DataFrame) -> list:
         if df.empty:
             return []
@@ -238,6 +285,7 @@ def render_dashboard_data(
         "quality_dip_3m": _with_trajectory(quality_dip_3m),
         "faded_bounces_1m": _with_trajectory(faded_bounces_1m),
         "current_strength": _with_trajectory(current_strength),
+        "rank_all_stocks": rank_all_payload,
         "screener": {
             "as_of": as_of.strftime("%Y-%m-%d"),
             "market_cap_updated": mcap_updated,
@@ -283,6 +331,7 @@ if __name__ == "__main__":
     print(f"  Quality Dip 3m: {len(payload['quality_dip_3m'])}")
     print(f"  Faded Bounces (warning): {len(payload['faded_bounces_1m'])}")
     print(f"  Current Strength: {len(payload['current_strength'])}")
+    print(f"  Rank All Stocks: {len(payload['rank_all_stocks'])}")
     print(f"  Screener stocks: {len(payload['screener']['stocks'])}")
     print(f"  Sectors: {len(payload['sector_rotation'])}")
     print(f"  Sub-industries: {len(payload['sub_industry_rotation'])}")

@@ -29,6 +29,7 @@
   <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
   <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
   <button class="tab" data-tab="current-strength">📈 Current Strength</button>
+  <button class="tab" data-tab="rank-all">📋 Rank All</button>
   <button class="tab" data-tab="screener">📊 Universe Screener</button>
   <button class="tab" data-tab="sectors">🌡 Sector Heatmap</button>
   <button class="tab" data-tab="sub-industries">🔬 Sub-Industries</button>
@@ -89,6 +90,37 @@
       означава че е sector-relative силен но абсолютно умерен.
     </p>
     <div class="table-host"></div>
+  </section>
+
+  <section id="rank-all" class="view">
+    <h2>📋 Rank All — всички акции, подредени по Score</h2>
+    <p class="view-desc">
+      Пълно подреждане на 500+ SP500 акции по нашия <strong>Score</strong> (sector-relative percentile rank,
+      V2 еквивалент на старата "weighted_return / vol + 0.3·sharpe" формула).
+      Колоната <strong>#</strong> е позицията в подреждането, най-добрите отгоре.
+      Включва всички ranking метрики: Score, Abs %ile, 12-1 Mom %, Base, Δ 1m, Δ 3m, и quadrant класификация.
+      Филтрирай по сектор, за да видиш напр. всички Information Technology акции.
+    </p>
+    <div class="screener-controls">
+      <label>Сектор:
+        <select id="rank-sector"><option value="">Всички</option></select>
+      </label>
+      <label>Quadrant (1m):
+        <select id="rank-quadrant">
+          <option value="">Всички</option>
+          <option value="Stable Winner">Stable Winner</option>
+          <option value="Quality Dip">Quality Dip</option>
+          <option value="Faded Bounce">Faded Bounce</option>
+          <option value="Chronic Loser">Chronic Loser</option>
+          <option value="Neutral">Neutral</option>
+        </select>
+      </label>
+      <label>Търсене:
+        <input id="rank-search" type="text" placeholder="ticker или име..." />
+      </label>
+      <span id="rank-count" class="count-pill"></span>
+    </div>
+    <div class="table-host screener-table-host" id="rank-table-host"></div>
   </section>
 
   <section id="screener" class="view">
