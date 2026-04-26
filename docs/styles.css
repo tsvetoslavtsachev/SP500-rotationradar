@@ -223,6 +223,7 @@ body.screener-mode .tabs {
 
 body.screener-mode main {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -230,6 +231,7 @@ body.screener-mode main {
 
 body.screener-mode #screener.view {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -250,6 +252,7 @@ body.screener-mode .screener-controls {
 
 body.screener-mode .screener-table-host {
   flex: 1;
+  min-height: 0;
   max-height: none;
 }
 
