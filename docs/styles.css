@@ -188,76 +188,14 @@ tr:hover { background: var(--bg-elev-2); }
   border-radius: 6px;
 }
 
-/* Screener — fullscreen mode когато tab-ът е активен.
-   body.screener-mode се toggle-ва от app.js при tab change. */
+/* Screener — full viewport width breakout (без fullscreen режим). */
 body.screener-mode {
   max-width: none;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 12px 24px;
-  margin: 0;
-}
-
-body.screener-mode header {
-  flex-shrink: 0;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-}
-
-body.screener-mode .tagline,
-body.screener-mode .tagline small,
-body.screener-mode footer {
-  display: none;
-}
-
-body.screener-mode .metadata {
-  margin-top: 4px;
-}
-
-body.screener-mode .tabs {
-  flex-shrink: 0;
-  margin-bottom: 12px;
-}
-
-body.screener-mode main {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 body.screener-mode #screener.view {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-body.screener-mode #screener.view h2 {
-  flex-shrink: 0;
-  margin-bottom: 6px;
-}
-
-body.screener-mode #screener.view .view-desc {
-  display: none;
-}
-
-body.screener-mode .screener-controls {
-  flex-shrink: 0;
-}
-
-body.screener-mode .screener-table-host {
-  flex: 1;
-  min-height: 0;
-  max-height: none;
-}
-
-@media (max-width: 768px) {
-  body.screener-mode { padding: 8px 12px; }
+  width: 100%;
+  max-width: none;
 }
 
 /* Screener controls */
@@ -307,19 +245,19 @@ body.screener-mode .screener-table-host {
   font-variant-numeric: tabular-nums;
 }
 
+/* Точна реплика на stoxx600-momentumrank table approach. */
 .screener-table-host {
-  max-height: 75vh;
+  height: 75vh;
   overflow: auto;
+  position: relative;
   border: 1px solid var(--border);
   border-radius: 6px;
-  position: relative;
 }
 
 .screener-table-host table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
-  font-size: 12px;
+  table-layout: fixed;
   font-variant-numeric: tabular-nums;
 }
 
@@ -332,33 +270,35 @@ body.screener-mode .screener-table-host {
 .screener-table-host thead th {
   background: var(--bg-elev-2);
   border-bottom: 2px solid var(--border);
-  padding: 8px 10px;
-  height: 40px;
-  white-space: nowrap;
-  cursor: pointer;
+  padding: 0 8px;
+  height: 36px;
   text-align: left;
+  font-size: 11px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
   color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .screener-table-host thead th:hover { color: var(--text); }
 
 .screener-table-host tbody tr {
-  height: 32px;
+  height: 30px;
   border-bottom: 1px solid rgba(48, 54, 61, 0.5);
 }
 
 .screener-table-host tbody tr:hover { background: var(--bg-elev-2); }
 
 .screener-table-host td {
-  padding: 6px 10px;
+  padding: 0 8px;
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.screener-table-host td.col-name {
-  max-width: 220px;
+  vertical-align: middle;
 }
 
 /* Heatmap */
