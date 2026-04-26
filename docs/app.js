@@ -1,9 +1,25 @@
 // SP500 Rotation Radar — UI rendering logic.
-// Чете data.json и рендерира 7 различни views.
+// Чете data.json и рендерира всички views.
+
+// Държи текущите данни за всеки tab — за Excel export-а.
+// За tabs с filters (rank-all, screener), стойността е CURRENT FILTERED set.
+const exportState = {
+  asOf: null,
+  "stable-winners-1m": [],
+  "stable-winners-3m": [],
+  "quality-dip-1m": [],
+  "quality-dip-3m": [],
+  "faded-bounces": [],
+  "current-strength": [],
+  "rank-all": [],
+  "screener": [],
+};
 
 (async () => {
   const data = await fetchData();
   if (!data) return;
+
+  exportState.asOf = data.metadata?.as_of || "unknown";
 
   renderMetadata(data.metadata);
   renderWatchlist("stable-winners-1m", data.stable_winners_1m, "1m");
@@ -17,6 +33,7 @@
   renderHeatmap("sectors", data.sector_rotation);
   renderSubIndustryTable("sub-industries", data.sub_industry_rotation);
   setupTabs();
+  setupExportButtons();
 })();
 
 async function fetchData() {
@@ -42,6 +59,9 @@ function renderMetadata(meta) {
 
 function renderWatchlist(viewId, rows, deltaWindow) {
   const host = document.querySelector(`#${viewId} .table-host`);
+  if (Object.prototype.hasOwnProperty.call(exportState, viewId)) {
+    exportState[viewId] = rows || [];
+  }
   if (!rows || rows.length === 0) {
     host.innerHTML = `<div class="empty-state">Няма kandidaти в този quadrant сега.</div>`;
     return;
@@ -176,6 +196,7 @@ function makeTrajectorySVG(points) {
 
 function renderCurrentStrength(viewId, rows) {
   const host = document.querySelector(`#${viewId} .table-host`);
+  exportState["current-strength"] = rows || [];
   if (!rows || rows.length === 0) {
     host.innerHTML = `<div class="empty-state">Няма данни за Current Strength.</div>`;
     return;
@@ -457,6 +478,7 @@ function renderRankAll(viewId, stocks) {
     }
 
     countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
+    exportState["rank-all"] = filtered;
     renderTable(filtered);
   }
 
@@ -621,6 +643,7 @@ function renderScreener(viewId, screenerData) {
     }
 
     countPill.textContent = `${filtered.length} / ${stocks.length} акции`;
+    exportState["screener"] = filtered;
     renderTable(filtered);
   }
 
@@ -713,6 +736,126 @@ function sortTableByCol(table, colIdx, desc, key) {
     return desc ? vb.localeCompare(va) : va.localeCompare(vb);
   });
   rows.forEach((r) => tbody.appendChild(r));
+}
+
+// Map от tab id към human-readable label + sheet column conf за Excel export.
+// За всеки tab дефинираме кои полета да се пишат и под какви имена.
+const EXPORT_CONFIG = {
+  "stable-winners-1m": {
+    label: "Stable Winners 1m",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "stable-winners-3m": {
+    label: "Stable Winners 3m",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "quality-dip-1m": {
+    label: "Quality Dip 1m",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "quality-dip-3m": {
+    label: "Quality Dip 3m",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "faded-bounces": {
+    label: "Faded Bounces",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "current-strength": {
+    label: "Current Strength",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["mom_12_1_pct", "12-1 Mom %"], ["abs_strength", "Abs %ile"], ["current_rank", "Sector Rank"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+    ],
+  },
+  "rank-all": {
+    label: "Rank All",
+    columns: [
+      ["rank_position", "#"], ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["score", "Score"], ["abs_strength", "Abs %ile"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["base_rank_6m", "Base 6m"], ["delta_1m", "Δ 1m"], ["delta_3m", "Δ 3m"],
+      ["quadrant_1m", "Quadrant 1m"], ["quadrant_3m", "Quadrant 3m"],
+    ],
+  },
+  "screener": {
+    label: "Universe Screener",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["industry", "Sub-Industry"],
+      ["market_cap_m", "Mcap (M$)"], ["size_bucket", "Size"],
+      ["ret_1m", "1M %"], ["ret_3m", "3M %"], ["ret_6m", "6M %"], ["ret_ytd", "YTD %"],
+      ["ret_1y", "1Y %"], ["ret_3y", "3Y %"], ["ret_5y", "5Y %"],
+      ["vol_1y", "Vol 1Y %"], ["sharpe_1y", "Sharpe 1Y"], ["sharpe_3y", "Sharpe 3Y"],
+      ["maxdd_1y", "MaxDD 1Y %"], ["maxdd_3y", "MaxDD 3Y %"], ["maxdd_5y", "MaxDD 5Y %"],
+      ["calmar_3y", "Calmar 3Y"], ["dist_52w_high", "from 52w-H %"],
+      ["days_since_52w_high", "Days since H"], ["beta_1y", "Beta 1Y"],
+    ],
+  },
+};
+
+function exportTabToExcel(tabId) {
+  if (typeof XLSX === "undefined") {
+    alert("XLSX library още не е заредена. Изчакай един момент и опитай пак.");
+    return;
+  }
+  const config = EXPORT_CONFIG[tabId];
+  if (!config) return;
+
+  const rows = exportState[tabId] || [];
+  if (rows.length === 0) {
+    alert("Няма данни за export.");
+    return;
+  }
+
+  const sheetData = rows.map((row) => {
+    const out = {};
+    config.columns.forEach(([key, label]) => {
+      const v = row[key];
+      out[label] = v === null || v === undefined ? "" : v;
+    });
+    return out;
+  });
+
+  const ws = XLSX.utils.json_to_sheet(sheetData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, config.label.substring(0, 31));
+
+  const dateStr = (exportState.asOf || "data").replace(/[^0-9-]/g, "");
+  const safeName = tabId.replace(/-/g, "_");
+  const filename = `rotation_radar_${safeName}_${dateStr}.xlsx`;
+  XLSX.writeFile(wb, filename);
+}
+
+function setupExportButtons() {
+  document.querySelectorAll(".export-btn").forEach((btn) => {
+    const tabId = btn.dataset.export;
+    btn.addEventListener("click", () => exportTabToExcel(tabId));
+  });
 }
 
 function setupTabs() {

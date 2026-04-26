@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SP500 Rotation Radar</title>
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <header>
@@ -44,12 +45,14 @@
       Лидерството не отстъпва. Тук е ровенето.
     </p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="stable-winners-1m">📥 Export to Excel</button></div>
   </section>
 
   <section id="stable-winners-3m" class="view">
     <h2>🎯 Stable Winners (3m delta)</h2>
     <p class="view-desc">Същата логика, но 3-месечен поглед. По-стабилен, по-малко candidates.</p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="stable-winners-3m">📥 Export to Excel</button></div>
   </section>
 
   <section id="quality-dip-1m" class="view">
@@ -62,12 +65,14 @@
       но абсолютно слаба (best of bad sector), което може да е chronic decline, не Quality Dip.
     </p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="quality-dip-1m">📥 Export to Excel</button></div>
   </section>
 
   <section id="quality-dip-3m" class="view">
     <h2>💎 Quality Dip (3m delta)</h2>
     <p class="view-desc">3-месечно отслабване на лидери. По-сериозна реакция → по-голяма възможност при reversion.</p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="quality-dip-3m">📥 Export to Excel</button></div>
   </section>
 
   <section id="faded-bounces" class="view">
@@ -78,6 +83,7 @@
       Падналите ангели рядко се възстановяват. Тук е contra-list — какво да НЕ купиш.
     </p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="faded-bounces">📥 Export to Excel</button></div>
   </section>
 
   <section id="current-strength" class="view">
@@ -90,6 +96,7 @@
       означава че е sector-relative силен но абсолютно умерен.
     </p>
     <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="current-strength">📥 Export to Excel</button></div>
   </section>
 
   <section id="rank-all" class="view">
@@ -121,6 +128,7 @@
       <span id="rank-count" class="count-pill"></span>
     </div>
     <div class="table-host screener-table-host" id="rank-table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="rank-all">📥 Export to Excel (filtered)</button></div>
   </section>
 
   <section id="screener" class="view">
@@ -148,6 +156,7 @@
       <span id="screener-count" class="count-pill"></span>
     </div>
     <div class="table-host screener-table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="screener">📥 Export to Excel (filtered)</button></div>
   </section>
 
   <section id="sectors" class="view">
