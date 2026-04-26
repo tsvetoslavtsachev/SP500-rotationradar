@@ -188,6 +188,20 @@ tr:hover { background: var(--bg-elev-2); }
   border-radius: 6px;
 }
 
+/* Screener — full viewport width breakout */
+#screener.view {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  #screener.view { padding: 0 12px; }
+}
+
 /* Screener controls */
 .screener-controls {
   display: flex;
@@ -236,24 +250,62 @@ tr:hover { background: var(--bg-elev-2); }
 }
 
 .screener-table-host {
-  overflow-x: auto;
-  max-height: 70vh;
+  overflow: auto;
+  max-height: 75vh;
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 .screener-table-host table {
   font-size: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .screener-table-host th {
   position: sticky;
   top: 0;
   z-index: 10;
+  background: var(--bg-elev-2);
 }
 
 .screener-table-host td {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  background: var(--bg-elev);
 }
+
+/* Frozen first 2 columns: Ticker + Name */
+.screener-table-host th:nth-child(1),
+.screener-table-host td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  z-index: 5;
+  border-right: 1px solid var(--border);
+}
+
+.screener-table-host th:nth-child(2),
+.screener-table-host td:nth-child(2) {
+  position: sticky;
+  left: 80px;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  z-index: 4;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Corner cells (sticky top + sticky left) need higher z-index */
+.screener-table-host th:nth-child(1) { z-index: 15; }
+.screener-table-host th:nth-child(2) { z-index: 14; }
+
+/* Hover state preserves sticky background */
+.screener-table-host tr:hover td { background: var(--bg-elev-2); }
 
 /* Heatmap */
 .heatmap {
