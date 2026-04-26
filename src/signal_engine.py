@@ -10,7 +10,7 @@ Signal Engine V2 — pure 12-1 momentum, sector-relative z-score.
 Backtest показа (виж scripts/backtest_v2.py):
   Stable Winners (висока база, продължава да се качва) → +3.34% excess fwd_63d
   Quality Dip (висока база, временна слабост)         → +1.72% excess fwd_63d
-  Faded Bounces (низка база, скорошен скок)           → -0.44% excess fwd_63d
+  Faded Bounces (ниска база, скорошен скок)           → -0.44% excess fwd_63d
   Chronic Losers                                       → ~neutral (+0.41%)
 
 Тоест "купи лидерите" е реалния сигнал, не "хвани падналите ангели".

@@ -187,7 +187,7 @@ def get_quality_dip(deltas: pd.DataFrame, window: str = "1m", limit: int = 20) -
 
 def get_faded_bounces(deltas: pd.DataFrame, window: str = "1m", limit: int = 20) -> pd.DataFrame:
     """
-    AVOID — низка база + скорошен скок.
+    AVOID — ниска база + скорошен скок.
     Backtest показа -0.44% excess fwd_63d. Падналите ангели обикновено избледняват.
 
     Тук са показани само за прозрачност / contrarian view.
