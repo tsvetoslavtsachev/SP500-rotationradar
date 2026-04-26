@@ -68,6 +68,11 @@ h1 {
   margin-bottom: 20px;
   flex-wrap: wrap;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  padding-top: 8px;
 }
 
 .tab {
@@ -256,8 +261,9 @@ body.screener-mode #screener.view {
 
 .screener-table-host table {
   width: 100%;
+  min-width: 2400px;  /* 23 колони — форсира horizontal scroll */
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-variant-numeric: tabular-nums;
 }
 
