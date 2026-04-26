@@ -309,79 +309,56 @@ body.screener-mode .screener-table-host {
 
 .screener-table-host {
   max-height: 75vh;
+  overflow: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
-  overflow: hidden;
+  position: relative;
 }
 
-/* Split panes: frozen left (Ticker + Name) + scrollable right (everything else) */
-.screener-split {
-  display: flex;
-  height: 100%;
-  max-height: 75vh;
-  overflow: hidden;
-}
-
-.screener-frozen-pane {
-  flex-shrink: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-right: 2px solid var(--accent);
-  scrollbar-width: none;  /* Firefox */
-}
-
-.screener-frozen-pane::-webkit-scrollbar {
-  display: none;  /* Chrome/Safari */
-}
-
-.screener-scroll-pane {
-  flex: 1;
-  overflow: auto;
-  min-width: 0;
-}
-
-.screener-split table {
-  font-size: 12px;
-  border-collapse: separate;
-  border-spacing: 0;
+.screener-table-host table {
   width: 100%;
-  table-layout: fixed;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.screener-split th {
+.screener-table-host thead {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.screener-table-host thead th {
   background: var(--bg-elev-2);
-  box-sizing: border-box;
-  height: 40px;
+  border-bottom: 2px solid var(--border);
   padding: 8px 10px;
+  height: 40px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-shadow: 0 1px 0 var(--border);
+  cursor: pointer;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-dim);
 }
 
-.screener-split td {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  background: var(--bg-elev);
-  box-sizing: border-box;
+.screener-table-host thead th:hover { color: var(--text); }
+
+.screener-table-host tbody tr {
   height: 32px;
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(48, 54, 61, 0.5);
 }
 
-.screener-split tr:hover td { background: var(--bg-elev-2); }
+.screener-table-host tbody tr:hover { background: var(--bg-elev-2); }
 
-/* Frozen pane column widths */
-.screener-frozen-pane .col-ticker { width: 80px; min-width: 80px; max-width: 80px; }
-.screener-frozen-pane .col-name {
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px;
+.screener-table-host td {
+  padding: 6px 10px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.screener-table-host td.col-name {
+  max-width: 220px;
 }
 
 /* Heatmap */
