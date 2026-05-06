@@ -27,6 +27,15 @@ from src.sector_engine import get_sector_dataframe  # noqa: E402
 from src.signal_engine import compute_cross_section  # noqa: E402
 from src.universe import fetch_full_universe  # noqa: E402
 
+DATA_DIR = ROOT / "data"
+HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
+PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
+SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
+MARKET_CAPS_PATH = DATA_DIR / "market_caps.json"
+
+# За screener-а ни трябват 5 години → пазим минимум 6 години
+LOOKBACK_DAYS_FOR_SCORING = 1500
+MARKET_CAP_REFRESH_DAYS = 7
 
 def load_sector_map_for_scoring(cache_path: Path) -> dict[str, str]:
     """
@@ -62,16 +71,6 @@ def maybe_refresh_market_caps() -> None:
     from scripts.fetch_market_caps import fetch_all, save
     caps = fetch_all()
     save(caps)
-
-DATA_DIR = ROOT / "data"
-HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
-PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
-SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
-MARKET_CAPS_PATH = DATA_DIR / "market_caps.json"
-
-# За screener-а ни трябват 5 години → пазим минимум 6 години
-LOOKBACK_DAYS_FOR_SCORING = 1500
-MARKET_CAP_REFRESH_DAYS = 7
 
 
 def update_prices_cache(tickers: list[str]) -> pd.DataFrame:
