@@ -13,6 +13,9 @@ const exportState = {
   "current-strength": [],
   "rank-all": [],
   "screener": [],
+  "rs-inflection": [],
+  "power-confluence": [],
+  "sector-rs": [],
 };
 
 (async () => {
@@ -32,6 +35,9 @@ const exportState = {
   renderScreener("screener", data.screener);
   renderHeatmap("sectors", data.sector_rotation);
   renderSubIndustryTable("sub-industries", data.sub_industry_rotation);
+  renderRSInflection(data);
+  renderPowerConfluence("power-confluence", data.power_confluence);
+  renderSectorRS("sector-rs", data.sector_rs);
   setupTabs();
   setupExportButtons();
 })();
@@ -693,6 +699,352 @@ function renderScreener(viewId, screenerData) {
   applyFilters();
 }
 
+// ── RS Line tabs ─────────────────────────────────────────────────────────────
+
+function makeRSTrajectorySVG(points) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "trajectory");
+  svg.setAttribute("viewBox", "0 0 100 24");
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  if (!points || points.length < 2) return svg;
+
+  const values = points.map((p) => p.rs).filter((v) => v !== null && v !== undefined);
+  if (values.length < 2) return svg;
+
+  const w = 100, h = 24;
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const range = hi - lo || 1e-9;
+  const xStep = w / (points.length - 1);
+
+  const path = points
+    .map((p, i) => {
+      const x = i * xStep;
+      const y = h - ((p.rs - lo) / range) * h;
+      return (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+    })
+    .join(" ");
+
+  const last = values[values.length - 1];
+  const first = values[0];
+  const stroke = last > first ? "var(--riser)" : "var(--decayer)";
+
+  const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pathEl.setAttribute("d", path);
+  pathEl.setAttribute("stroke", stroke);
+  pathEl.setAttribute("stroke-width", "1.5");
+  pathEl.setAttribute("fill", "none");
+  svg.appendChild(pathEl);
+
+  const titleEl = document.createElementNS("http://www.w3.org/2000/svg", "title");
+  const startDate = points[0]?.date ?? "";
+  const endDate = points[points.length - 1]?.date ?? "";
+  titleEl.textContent =
+    `RS Line trajectory: ${first.toFixed(4)} → ${last.toFixed(4)} ` +
+    `(${startDate} → ${endDate}, ${points.length} търговски дни)`;
+  svg.appendChild(titleEl);
+
+  return svg;
+}
+
+function buildRSTable(rows, opts = {}) {
+  const headers = [
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "price", label: "Price" },
+    { key: "pct_from_52w_high", label: "from 52w-H %" },
+    { key: "rs_value", label: "RS" },
+    { key: "cloud_color", label: "Cloud" },
+    { key: "days_since_crossover", label: "Days since" },
+    { key: "rs_slope_norm", label: "RS Slope" },
+    { key: "trend_quality", label: "Trend" },
+    { key: "score", label: "Score" },
+    { key: "rs_trajectory", label: "RS Path (90d)" },
+  ];
+
+  if (opts.skipCloud) {
+    const idx = headers.findIndex((h) => h.key === "cloud_color");
+    if (idx >= 0) headers.splice(idx, 1);
+  }
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  headers.forEach((h, idx) => {
+    const th = document.createElement("th");
+    th.textContent = h.label;
+    th.dataset.col = idx;
+    th.dataset.key = h.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    headers.forEach((h) => {
+      const td = document.createElement("td");
+      const v = row[h.key];
+      if (h.key === "ticker") {
+        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+      } else if (h.key === "rs_trajectory") {
+        td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
+      } else if (h.key === "cloud_color") {
+        td.innerHTML = v === "green"
+          ? `<span class="cloud cloud-green">▲ green</span>`
+          : `<span class="cloud cloud-red">▼ red</span>`;
+        td.dataset.value = v;
+      } else if (h.key === "trend_quality") {
+        td.textContent = v === 1 ? "✓" : "—";
+        td.dataset.value = v ?? 0;
+        if (v === 1) td.style.color = "var(--riser)";
+      } else if (h.key === "days_since_crossover") {
+        td.textContent = v === null || v === undefined ? "—" : v;
+        td.dataset.value = v ?? "";
+      } else if (h.key === "score") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+        td.style.fontWeight = "600";
+      } else if (h.key === "pct_from_52w_high") {
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+          td.className = v >= -3 ? "delta-positive" : v < -15 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "rs_slope_norm") {
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "rs_value") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(4);
+        td.dataset.value = v ?? "";
+      } else if (h.key === "price") {
+        td.textContent = v === null || v === undefined ? "—" : "$" + v.toFixed(2);
+        td.dataset.value = v ?? "";
+      } else {
+        td.textContent = v === null || v === undefined ? "—" : v;
+        td.dataset.value = v ?? "";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  attachSorting(table, headers);
+  return table;
+}
+
+function renderRSInflection(data) {
+  // Combine three lists into single export blob (с разделителна marker)
+  const combined = [];
+  (data.rs_inflection_bullish || []).forEach((r) => combined.push({ category: "Bullish", ...r }));
+  (data.rs_inflection_bearish || []).forEach((r) => combined.push({ category: "Bearish", ...r }));
+  (data.rs_new_highs || []).forEach((r) => combined.push({ category: "RS New High", ...r }));
+  exportState["rs-inflection"] = combined;
+
+  const renderInto = (hostId, rows, emptyMsg) => {
+    const host = document.getElementById(hostId);
+    if (!host) return;
+    if (!rows || rows.length === 0) {
+      host.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+      return;
+    }
+    host.replaceChildren(buildRSTable(rows));
+  };
+
+  renderInto("rs-bullish-host", data.rs_inflection_bullish, "Няма bullish crossovers в последните 5 дни.");
+  renderInto("rs-bearish-host", data.rs_inflection_bearish, "Няма bearish crossovers в последните 5 дни.");
+  renderInto("rs-newhighs-host", data.rs_new_highs, "Няма RS new highs (без crossover).");
+}
+
+function renderPowerConfluence(viewId, rows) {
+  const host = document.querySelector(`#${viewId} .table-host`);
+  exportState["power-confluence"] = rows || [];
+  if (!rows || rows.length === 0) {
+    host.innerHTML = `<div class="empty-state">Няма Power Confluence сигнали днес — Stable Winner + fresh bullish RS crossover не съвпадат.</div>`;
+    return;
+  }
+
+  const headers = [
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "current_rank", label: "Sector Rank" },
+    { key: "base_rank_6m", label: "Base 6m" },
+    { key: "delta_1m", label: "Δ 1m" },
+    { key: "mom_12_1_pct", label: "12-1 Mom %" },
+    { key: "rs_value", label: "RS" },
+    { key: "days_since_crossover", label: "Cross day" },
+    { key: "rs_score", label: "RS Score" },
+    { key: "combined_score", label: "Combined" },
+    { key: "rs_trajectory", label: "RS Path (90d)" },
+  ];
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  headers.forEach((h, idx) => {
+    const th = document.createElement("th");
+    th.textContent = h.label;
+    th.dataset.col = idx;
+    th.dataset.key = h.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    headers.forEach((h) => {
+      const td = document.createElement("td");
+      const v = row[h.key];
+      if (h.key === "ticker") {
+        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+      } else if (h.key === "rs_trajectory") {
+        td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
+      } else if (h.key === "delta_1m" || h.key === "mom_12_1_pct") {
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          const suffix = h.key === "mom_12_1_pct" ? "%" : "";
+          td.textContent = (v > 0 ? "+" : "") + v.toFixed(1) + suffix;
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "current_rank" || h.key === "base_rank_6m" || h.key === "rs_score") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+      } else if (h.key === "combined_score") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+        td.style.fontWeight = "600";
+        td.style.color = "var(--accent)";
+      } else if (h.key === "rs_value") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(4);
+        td.dataset.value = v ?? "";
+      } else if (h.key === "days_since_crossover") {
+        td.textContent = v === null || v === undefined ? "—" : v === 0 ? "today" : v + "d ago";
+        td.dataset.value = v ?? "";
+      } else {
+        td.textContent = v === null || v === undefined ? "—" : v;
+        td.dataset.value = v ?? "";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  host.replaceChildren(table);
+  attachSorting(table, headers);
+}
+
+function renderSectorRS(viewId, rows) {
+  const host = document.querySelector(`#${viewId} .table-host`);
+  exportState["sector-rs"] = rows || [];
+  if (!rows || rows.length === 0) {
+    host.innerHTML = `<div class="empty-state">Няма sector RS данни.</div>`;
+    return;
+  }
+
+  const headers = [
+    { key: "symbol", label: "ETF" },
+    { key: "name", label: "Sector" },
+    { key: "price", label: "Price" },
+    { key: "rs_value", label: "RS" },
+    { key: "cloud_color", label: "Cloud" },
+    { key: "days_since_crossover", label: "Days since cross" },
+    { key: "rs_slope_norm", label: "RS Slope" },
+    { key: "rs_new_high", label: "52w RS High" },
+    { key: "stocks_n_risers", label: "Bull Stocks" },
+    { key: "stocks_n_decayers", label: "Bear Stocks" },
+    { key: "score", label: "Score" },
+    { key: "rs_trajectory", label: "RS Path (90d)" },
+  ];
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  headers.forEach((h, idx) => {
+    const th = document.createElement("th");
+    th.textContent = h.label;
+    th.dataset.col = idx;
+    th.dataset.key = h.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    headers.forEach((h) => {
+      const td = document.createElement("td");
+      const v = row[h.key];
+      if (h.key === "symbol") {
+        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.symbol}" target="_blank" rel="noopener">${row.symbol}</a>`;
+      } else if (h.key === "rs_trajectory") {
+        td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
+      } else if (h.key === "cloud_color") {
+        td.innerHTML = v === "green"
+          ? `<span class="cloud cloud-green">▲ green</span>`
+          : `<span class="cloud cloud-red">▼ red</span>`;
+        td.dataset.value = v;
+      } else if (h.key === "rs_new_high") {
+        td.textContent = v ? "★" : "—";
+        td.dataset.value = v ? 1 : 0;
+        if (v) td.style.color = "var(--accent)";
+      } else if (h.key === "rs_slope_norm") {
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "stocks_n_risers") {
+        td.textContent = v ?? 0;
+        td.dataset.value = v ?? 0;
+        td.style.color = "var(--riser)";
+      } else if (h.key === "stocks_n_decayers") {
+        td.textContent = v ?? 0;
+        td.dataset.value = v ?? 0;
+        td.style.color = "var(--decayer)";
+      } else if (h.key === "days_since_crossover") {
+        td.textContent = v === null || v === undefined ? "—" : v === 0 ? "today" : v + "d ago";
+        td.dataset.value = v ?? "";
+      } else if (h.key === "rs_value") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(4);
+        td.dataset.value = v ?? "";
+      } else if (h.key === "price") {
+        td.textContent = v === null || v === undefined ? "—" : "$" + v.toFixed(2);
+        td.dataset.value = v ?? "";
+      } else if (h.key === "score") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+        td.style.fontWeight = "600";
+      } else {
+        td.textContent = v === null || v === undefined ? "—" : v;
+        td.dataset.value = v ?? "";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  host.replaceChildren(table);
+  attachSorting(table, headers);
+}
+
 function heatColor(value, maxAbs) {
   if (value === null || value === undefined) return "var(--bg-elev-2)";
   const t = Math.max(-1, Math.min(1, value / maxAbs));
@@ -814,6 +1166,39 @@ const EXPORT_CONFIG = {
       ["maxdd_1y", "MaxDD 1Y %"], ["maxdd_3y", "MaxDD 3Y %"], ["maxdd_5y", "MaxDD 5Y %"],
       ["calmar_3y", "Calmar 3Y"], ["dist_52w_high", "from 52w-H %"],
       ["days_since_52w_high", "Days since H"], ["beta_1y", "Beta 1Y"],
+    ],
+  },
+  "rs-inflection": {
+    label: "RS Inflection",
+    columns: [
+      ["category", "List"], ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["price", "Price"], ["pct_from_52w_high", "from 52w-H %"],
+      ["rs_value", "RS"], ["cloud_color", "Cloud"],
+      ["bullish_crossover", "Bull Cross"], ["bearish_crossover", "Bear Cross"],
+      ["days_since_crossover", "Days Since Cross"],
+      ["rs_new_high", "RS 52w High"], ["price_new_high", "Price 52w High"], ["confluence", "Confluence"],
+      ["rs_slope_norm", "RS Slope"], ["trend_quality", "Trend OK"], ["score", "Score"],
+    ],
+  },
+  "power-confluence": {
+    label: "Power Confluence",
+    columns: [
+      ["ticker", "Ticker"], ["name", "Name"], ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["current_rank", "Sector Rank"], ["base_rank_6m", "Base 6m"],
+      ["delta_1m", "Δ 1m"], ["mom_12_1_pct", "12-1 Mom %"],
+      ["rs_value", "RS"], ["days_since_crossover", "Days Since Cross"],
+      ["rs_score", "RS Score"], ["combined_score", "Combined Score"],
+    ],
+  },
+  "sector-rs": {
+    label: "Sector RS",
+    columns: [
+      ["symbol", "ETF"], ["name", "Sector Name"], ["gics_sector", "GICS Sector"],
+      ["price", "Price"], ["rs_value", "RS"], ["cloud_color", "Cloud"],
+      ["bullish_crossover", "Bull Cross"], ["bearish_crossover", "Bear Cross"],
+      ["days_since_crossover", "Days Since Cross"],
+      ["rs_new_high", "RS 52w High"], ["rs_slope_norm", "RS Slope"], ["score", "Score"],
+      ["stocks_n_risers", "Stock Risers"], ["stocks_n_decayers", "Stock Decayers"], ["stocks_n_total", "Stocks N"],
     ],
   },
 };

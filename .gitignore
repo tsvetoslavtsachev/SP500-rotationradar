@@ -14,3 +14,4 @@ data/ranks_history_v2.parquet
 # IDE
 .vscode/
 .idea/
+.claude/

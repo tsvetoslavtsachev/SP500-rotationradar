@@ -20,6 +20,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.etf_universe import benchmark_universe_tickers  # noqa: E402
 from src.prices import download_prices  # noqa: E402
 from src.rank_history import HISTORY_COLUMNS, append_snapshot  # noqa: E402
 from src.render import render_dashboard_data  # noqa: E402
@@ -30,11 +31,14 @@ from src.universe import fetch_full_universe  # noqa: E402
 DATA_DIR = ROOT / "data"
 HISTORY_PATH = DATA_DIR / "ranks_history.parquet"
 PRICES_CACHE_PATH = DATA_DIR / "prices_cache.parquet"
+BENCHMARK_PRICES_PATH = DATA_DIR / "benchmark_prices.parquet"
 SECTOR_CACHE_PATH = DATA_DIR / "sector_map.json"
 MARKET_CAPS_PATH = DATA_DIR / "market_caps.json"
 
 # За screener-а ни трябват 5 години → пазим минимум 6 години
 LOOKBACK_DAYS_FOR_SCORING = 1500
+# RS Line има нужда само от 50 SMA + 252-day high → 2y е достатъчно
+BENCHMARK_LOOKBACK_DAYS = 2 * 365
 MARKET_CAP_REFRESH_DAYS = 7
 
 def load_sector_map_for_scoring(cache_path: Path) -> dict[str, str]:
@@ -120,31 +124,80 @@ def update_prices_cache(tickers: list[str]) -> pd.DataFrame:
     return prices
 
 
+def update_benchmark_cache(tickers: list[str]) -> pd.DataFrame:
+    """
+    Incremental update за benchmark + sector ETF prices.
+    Държи се отделно от prices_cache, за да не замърси sector z-score изчислението.
+    Lookback: 2 години (50 SMA + 252-day high буфер).
+    """
+    end = pd.Timestamp.today().normalize()
+
+    if BENCHMARK_PRICES_PATH.exists():
+        cached = pd.read_parquet(BENCHMARK_PRICES_PATH)
+        cached.index = pd.to_datetime(cached.index)
+        last_date = cached.index.max()
+
+        if last_date >= end - pd.tseries.offsets.BusinessDay(1):
+            print(f"  Benchmark cache up to date ({last_date.date()}).")
+            return cached
+
+        start = last_date - pd.Timedelta(days=5)
+        print(f"  Benchmark incremental {start.date()} → {end.date()}")
+        new_prices = download_prices(tickers, start=start, end=end)
+
+        if new_prices.empty:
+            return cached
+
+        combined = pd.concat([
+            cached[~cached.index.isin(new_prices.index)],
+            new_prices,
+        ]).sort_index()
+        combined = combined.dropna(axis=1, how="all")
+
+        cutoff = end - pd.Timedelta(days=BENCHMARK_LOOKBACK_DAYS + 60)
+        trimmed = combined[combined.index >= cutoff]
+        trimmed.to_parquet(BENCHMARK_PRICES_PATH)
+        return trimmed
+
+    # No cache — full 2y download
+    start = end - pd.Timedelta(days=BENCHMARK_LOOKBACK_DAYS + 60)
+    print(f"  Benchmark full download {start.date()} → {end.date()} ({len(tickers)} tickers)")
+    prices = download_prices(tickers, start=start, end=end)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    prices.to_parquet(BENCHMARK_PRICES_PATH)
+    return prices
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("[1/5] Fetching SP500 universe...")
+    print("[1/6] Fetching SP500 universe...")
     universe = fetch_full_universe()
     tickers = universe[universe["is_current"]]["ticker"].tolist()
     print(f"      {len(tickers)} current tickers")
 
-    print("[2/5] Updating prices cache...")
+    print("[2/6] Updating prices cache...")
     prices = update_prices_cache(tickers)
     print(f"      {len(prices.columns)} tickers × {len(prices)} days")
 
-    print("[3/5] Computing today's cross-section (sector-relative z-score)...")
+    print("[3/6] Updating benchmark + sector ETF cache (SPY + 11 SPDR ETFs)...")
+    bench_tickers = benchmark_universe_tickers()
+    benchmark_prices = update_benchmark_cache(bench_tickers)
+    print(f"      {len(benchmark_prices.columns)} tickers × {len(benchmark_prices)} days")
+
+    print("[4/6] Computing today's cross-section (sector-relative z-score)...")
     sector_map = load_sector_map_for_scoring(SECTOR_CACHE_PATH)
     print(f"      Loaded {len(sector_map)} sector mappings")
     cs = compute_cross_section(prices, sector_map=sector_map)
     cs = cs.dropna(subset=["raw_score"])
     print(f"      {len(cs)} valid scores for {cs['date'].iloc[0].date()}")
 
-    print("[4/5] Appending snapshot to history...")
+    print("[5/6] Appending snapshot to history...")
     append_snapshot(HISTORY_PATH, cs[HISTORY_COLUMNS])
     size_mb = HISTORY_PATH.stat().st_size / 1e6
     print(f"      History now {size_mb:.1f} MB")
 
-    print("[5/5] Rendering data.json (incl. market cap refresh check + screener)...")
+    print("[6/6] Rendering data.json (incl. market cap refresh check + screener + RS line)...")
     maybe_refresh_market_caps()
     payload = render_dashboard_data()
     print(f"      Rendered: as of {payload['metadata']['as_of']}")
