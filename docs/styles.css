@@ -185,6 +185,70 @@ tr:hover { background: var(--bg-elev-2); }
   vertical-align: middle;
 }
 
+/* RS Line cloud badge — green = EMA10 > SMA50, red = under */
+.cloud {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+}
+.cloud-green { background: var(--riser-bg); color: var(--riser); }
+.cloud-red { background: var(--decayer-bg); color: var(--decayer); }
+
+/* Power Confluence — 4-quadrant matrix table */
+.confluence-matrix {
+  margin: 16px 0 8px;
+  background: var(--bg-elev);
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+
+.confluence-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+  font-size: 12px;
+}
+
+.confluence-table th {
+  background: transparent;
+  text-align: center;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+}
+
+.confluence-table td {
+  text-align: center;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+  font-size: 12px;
+}
+
+.confluence-table td:first-child {
+  text-align: left;
+  color: var(--text);
+}
+
+.confluence-table tr:hover { background: transparent; }
+
+.cell-power { background: rgba(88, 166, 255, 0.10); color: var(--accent); font-weight: 600; }
+.cell-warn { background: rgba(210, 153, 34, 0.10); color: var(--warn); }
+.cell-avoid { background: rgba(248, 81, 73, 0.10); color: var(--decayer); }
+.cell-hold { background: rgba(46, 160, 67, 0.10); color: var(--riser); }
+.cell-neutral { color: var(--text-dim); }
+
 .empty-state {
   padding: 40px;
   text-align: center;

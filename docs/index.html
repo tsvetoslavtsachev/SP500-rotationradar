@@ -30,6 +30,9 @@
   <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
   <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
   <button class="tab" data-tab="current-strength">📈 Current Strength</button>
+  <button class="tab" data-tab="rs-inflection">🔥 RS Inflection</button>
+  <button class="tab" data-tab="power-confluence">⚡ Power Confluence</button>
+  <button class="tab" data-tab="sector-rs">🌐 Sector RS</button>
   <button class="tab" data-tab="rank-all">📋 Rank All</button>
   <button class="tab" data-tab="screener">📊 Universe Screener</button>
   <button class="tab" data-tab="sectors">🌡 Sector Heatmap</button>
@@ -97,6 +100,88 @@
     </p>
     <div class="table-host"></div>
     <div class="export-bar"><button class="export-btn" data-export="current-strength">📥 Export to Excel</button></div>
+  </section>
+
+  <section id="rs-inflection" class="view">
+    <h2>🔥 RS Inflection — Fresh 10/50 EMA crossovers на RS Line</h2>
+    <p class="view-desc">
+      Pristine RS Line логика: <strong>RS = Stock / SPY</strong>, проследява 10 EMA / 50 SMA
+      пресичания. Bullish crossover улавя момента в който една акция започва да изпреварва SPY —
+      <em>седмици преди</em> ΔRank quadrant класификацията да реагира. Не всеки crossover води до
+      superperformance, но всяка superperformance започва с такъв.
+      <br>
+      <strong>Cross-check:</strong> провери дали същия тикер е в "⚡ Power Confluence" — там Stable
+      Winner overlay прецизира кои crossovers са по-висок conviction.
+    </p>
+    <h3 style="margin-top:18px;margin-bottom:8px;font-size:15px;color:var(--riser)">▲ Bullish Crossovers (last 5 days)</h3>
+    <div class="table-host" id="rs-bullish-host"></div>
+    <h3 style="margin-top:24px;margin-bottom:8px;font-size:15px;color:var(--decayer)">▼ Bearish Crossovers (last 5 days) — Avoidance List</h3>
+    <div class="table-host" id="rs-bearish-host"></div>
+    <h3 style="margin-top:24px;margin-bottom:8px;font-size:15px;color:var(--accent)">★ RS New Highs (без свеж crossover) — established leaders</h3>
+    <div class="table-host" id="rs-newhighs-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="rs-inflection">📥 Export to Excel</button></div>
+  </section>
+
+  <section id="power-confluence" class="view">
+    <h2>⚡ Power Confluence — Stable Winner × Fresh Bullish RS Crossover</h2>
+    <p class="view-desc">
+      Пресичане на двата сигнала: <strong>Stable Winner</strong> (висока 6м база + положителна ΔRank,
+      backtest +3.34% excess fwd_63d) <strong>И</strong> <strong>fresh bullish RS crossover</strong>
+      (timing trigger в последните 5 дни). Stable Winners сами по себе си са proven; добавянето на
+      RS crossover overlay дава точкова timing entry.
+    </p>
+    <div class="confluence-matrix">
+      <table class="confluence-table">
+        <thead>
+          <tr>
+            <th>Quadrant</th>
+            <th>+ Bullish RS Cross</th>
+            <th>+ Bearish RS Cross</th>
+            <th>+ No Cross</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Stable Winner</strong></td>
+            <td class="cell-power">🎯 POWER ENTRY</td>
+            <td class="cell-warn">⚠ early warning</td>
+            <td class="cell-hold">🟢 hold</td>
+          </tr>
+          <tr>
+            <td><strong>Quality Dip</strong></td>
+            <td class="cell-power">💎 dip reversal confirmed</td>
+            <td class="cell-avoid">🛑 dip deepens</td>
+            <td class="cell-neutral">💎 wait</td>
+          </tr>
+          <tr>
+            <td><strong>Faded Bounce</strong></td>
+            <td class="cell-neutral">— weak signal</td>
+            <td class="cell-avoid">🛑 confirmed avoid</td>
+            <td class="cell-avoid">🛑 avoid</td>
+          </tr>
+          <tr>
+            <td><strong>Chronic Loser</strong></td>
+            <td class="cell-neutral">— low value</td>
+            <td class="cell-neutral">—</td>
+            <td class="cell-neutral">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-host" style="margin-top:18px"></div>
+    <div class="export-bar"><button class="export-btn" data-export="power-confluence">📥 Export to Excel</button></div>
+  </section>
+
+  <section id="sector-rs" class="view">
+    <h2>🌐 Sector RS — 11 SPDR Select Sector ETFs vs SPY</h2>
+    <p class="view-desc">
+      Pristine RS Line на sector-level. Улавя кога секторното лидерство <strong>започва</strong> да
+      се сменя — преди интрасекторните akcii да реагират. Колоните <em>Bullish/Bearish Stocks Inside</em>
+      са cross-link с stock-level Sector Heatmap (n_risers / n_decayers): когато ETF-ът има bullish
+      RS crossover <em>и</em> високо ΔRank сред акциите вътре, ротацията е потвърдена и от двата слоя.
+    </p>
+    <div class="table-host"></div>
+    <div class="export-bar"><button class="export-btn" data-export="sector-rs">📥 Export to Excel</button></div>
   </section>
 
   <section id="rank-all" class="view">
