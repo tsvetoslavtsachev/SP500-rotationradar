@@ -42,6 +42,7 @@ from src.sector_engine import (  # noqa: E402
     get_sector_dataframe,
 )
 from src.signal_engine import compute_ticker_mom  # noqa: E402
+from src.transitions import compute_attention_signals  # noqa: E402
 
 DATA_DIR = ROOT / "data"
 DOCS_DIR = ROOT / "docs"
@@ -579,6 +580,7 @@ def render_dashboard_data(
         "rs_new_highs": rs_new_highs,
         "power_confluence": power_confluence,
         "sector_rs": [],  # populated below after sector_rotation is built
+        "attention_layer": compute_attention_signals(history, sectors),
     }
 
     if rs_meta is not None:
@@ -616,3 +618,8 @@ if __name__ == "__main__":
     print(f"  RS New Highs: {len(payload['rs_new_highs'])}")
     print(f"  Power Confluence: {len(payload['power_confluence'])}")
     print(f"  Sector RS: {len(payload['sector_rs'])}")
+    al = payload["attention_layer"]
+    n_premium = sum(t["is_premium"] for t in al["tickers"])
+    n_lonely = sum(t["is_lonely"] and not t["is_premium"] for t in al["tickers"])
+    print(f"  Attention Layer: {len(al['tickers'])} SW @ {al['latest_date']} "
+          f"({n_premium} Premium, {n_lonely} Lonely)")

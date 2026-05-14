@@ -5,6 +5,7 @@
 // За tabs с filters (rank-all, screener), стойността е CURRENT FILTERED set.
 const exportState = {
   asOf: null,
+  "attention": [],
   "stable-winners-1m": [],
   "stable-winners-3m": [],
   "quality-dip-1m": [],
@@ -25,6 +26,7 @@ const exportState = {
   exportState.asOf = data.metadata?.as_of || "unknown";
 
   renderMetadata(data.metadata);
+  renderAttention(data.attention_layer);
   renderWatchlist("stable-winners-1m", data.stable_winners_1m, "1m");
   renderWatchlist("stable-winners-3m", data.stable_winners_3m, "3m");
   renderWatchlist("quality-dip-1m", data.quality_dip_1m, "1m");
@@ -61,6 +63,141 @@ function renderMetadata(meta) {
     <span>📊 Universe: <strong>${meta.total_universe}</strong></span>
     <span>📚 History: ${meta.history_start} → ${meta.history_end}</span>
   `;
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Attention Layer — Premium + Lonely + Normal cohorts
+// ──────────────────────────────────────────────────────────────────────
+function renderAttention(layer) {
+  if (!layer) return;
+  const tickers = layer.tickers || [];
+
+  const premium = tickers.filter((t) => t.is_premium);
+  const lonely = tickers.filter((t) => t.is_lonely && !t.is_premium);
+  const normal = tickers.filter((t) => !t.is_lonely);
+
+  // Export combines all three cohorts with a "cohort" column
+  exportState["attention"] = [
+    ...premium.map((t) => ({ ...t, cohort: "Premium" })),
+    ...lonely.map((t) => ({ ...t, cohort: "Lonely" })),
+    ...normal.map((t) => ({ ...t, cohort: "Normal" })),
+  ];
+
+  // Meta line
+  const meta = document.getElementById("attention-meta");
+  if (meta) {
+    const csCount = lonely.filter((t) => t.is_cs_excluded).length;
+    const lonelyVisible = lonely.length - csCount;
+    meta.innerHTML = `
+      <span>📅 Ребаланс: <strong>${layer.latest_date ?? "—"}</strong></span>
+      <span class="pill premium"><strong>${premium.length}</strong> Premium (+9.15% hist.)</span>
+      <span class="pill lonely"><strong>${lonelyVisible}</strong> Lonely (+3.31% hist.)
+        ${csCount ? `<small style="color:var(--text-dim)"> + ${csCount} CS скрити</small>` : ""}</span>
+      <span class="pill normal"><strong>${normal.length}</strong> Normal SW (+0.31% hist.)</span>
+      <span><strong>${tickers.length}</strong> SW общо</span>
+    `;
+  }
+
+  renderAttentionTable("attention-premium-host", premium, { variant: "premium" });
+  renderAttentionTable("attention-lonely-host", lonely, { variant: "lonely", withCsToggle: true });
+  renderAttentionTable("attention-normal-host", normal, { variant: "normal" });
+
+  // Wire CS toggle
+  const toggle = document.getElementById("attention-cs-toggle");
+  if (toggle) {
+    toggle.checked = false;
+    toggle.addEventListener("change", () => {
+      const lonelyTable = document.querySelector("#attention-lonely-host table");
+      if (lonelyTable) {
+        lonelyTable.classList.toggle("show-cs", toggle.checked);
+      }
+    });
+  }
+}
+
+function renderAttentionTable(hostId, rows, opts = {}) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  if (!rows || rows.length === 0) {
+    const msg = opts.variant === "premium"
+      ? "На текущия ребаланс няма Premium кандидат. Това е нормално — Premium кохортата е около 1 акция на месец."
+      : "Няма данни.";
+    host.innerHTML = `<div class="empty-state">${msg}</div>`;
+    return;
+  }
+
+  const headers = [
+    { key: "ticker", label: "Ticker" },
+    { key: "name", label: "Name" },
+    { key: "sector", label: "Sector" },
+    { key: "sub_industry", label: "Sub-Industry" },
+    { key: "base_rank_6m", label: "Rank (6m)" },
+    { key: "sector_avg_rank", label: "Sector avg" },
+    { key: "delta_1m", label: "Δ 1m" },
+    { key: "sw_streak", label: "Streak (мес)" },
+  ];
+
+  const table = document.createElement("table");
+  table.className = "attention-table";
+  if (opts.variant === "lonely" && opts.withCsToggle) {
+    table.id = `${hostId}-table`;
+  }
+
+  // Header
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  headers.forEach((h, idx) => {
+    const th = document.createElement("th");
+    th.textContent = h.label;
+    th.dataset.col = idx;
+    th.dataset.key = h.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  // Body
+  const tbody = document.createElement("tbody");
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    if (row.is_premium) tr.classList.add("premium-row");
+    if (!row.is_premium && row.sw_streak >= 5) tr.classList.add("near-premium");
+    if (row.is_cs_excluded) tr.classList.add("cs-row");
+
+    headers.forEach((h) => {
+      const td = document.createElement("td");
+      const v = row[h.key];
+
+      if (h.key === "ticker") {
+        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        if (row.is_cs_excluded) {
+          td.innerHTML += '<span class="cs-tag">CS</span>';
+        }
+      } else if (h.key === "sw_streak") {
+        td.innerHTML = `<span class="streak-badge">${v} мес</span>`;
+        td.dataset.value = v;
+      } else if (h.key === "delta_1m") {
+        if (v === null || v === undefined) {
+          td.textContent = "—";
+        } else {
+          td.textContent = (v > 0 ? "+" : "") + v.toFixed(1);
+          td.className = v > 0 ? "delta-positive" : v < 0 ? "delta-negative" : "";
+        }
+        td.dataset.value = v ?? "";
+      } else if (h.key === "base_rank_6m" || h.key === "sector_avg_rank") {
+        td.textContent = v === null || v === undefined ? "—" : v.toFixed(1);
+        td.dataset.value = v ?? "";
+      } else {
+        td.textContent = v ?? "—";
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  host.replaceChildren(table);
+  attachSorting(table, headers);
 }
 
 function renderWatchlist(viewId, rows, deltaWindow) {
@@ -1093,6 +1230,17 @@ function sortTableByCol(table, colIdx, desc, key) {
 // Map от tab id към human-readable label + sheet column conf за Excel export.
 // За всеки tab дефинираме кои полета да се пишат и под какви имена.
 const EXPORT_CONFIG = {
+  "attention": {
+    label: "Attention Layer",
+    columns: [
+      ["cohort", "Cohort"], ["ticker", "Ticker"], ["name", "Name"],
+      ["sector", "Sector"], ["sub_industry", "Sub-Industry"],
+      ["base_rank_6m", "Rank 6m"], ["sector_avg_rank", "Sector Avg Rank"],
+      ["delta_1m", "Δ 1m"], ["sw_streak", "SW Streak (мес)"],
+      ["is_lonely", "Lonely"], ["is_premium", "Premium"],
+      ["is_cs_excluded", "Consumer Staples"],
+    ],
+  },
   "stable-winners-1m": {
     label: "Stable Winners 1m",
     columns: [

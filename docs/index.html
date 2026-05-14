@@ -24,8 +24,9 @@
 </header>
 
 <nav class="tabs">
-  <button class="tab active" data-tab="stable-winners-1m">🎯 Stable Winners (1m)</button>
-  <button class="tab" data-tab="stable-winners-3m">🎯 Stable Winners (3m)</button>
+  <button class="tab active" data-tab="attention">🎯 Внимание</button>
+  <button class="tab" data-tab="stable-winners-1m">Stable Winners (1m)</button>
+  <button class="tab" data-tab="stable-winners-3m">Stable Winners (3m)</button>
   <button class="tab" data-tab="quality-dip-1m">💎 Quality Dip (1m)</button>
   <button class="tab" data-tab="quality-dip-3m">💎 Quality Dip (3m)</button>
   <button class="tab" data-tab="faded-bounces">⚠ Faded Bounces (avoid)</button>
@@ -40,7 +41,68 @@
 </nav>
 
 <main>
-  <section id="stable-winners-1m" class="view active">
+  <section id="attention" class="view active">
+    <h2>🎯 Внимание — Пазарът зад гърба им</h2>
+    <p class="view-desc">
+      <strong>Силни акции в относително слаби сектори.</strong> Виж ги, после провери финансите им.
+      <br>
+      Базирано на 10-годишен бектест (2016-2026, 53,627 ticker-month observations,
+      out-of-sample 2022-2025). Empirically validated layer върху съществуващата
+      Stable Winners класификация.
+    </p>
+
+    <div class="attention-meta" id="attention-meta"></div>
+
+    <h3 class="attention-section-title premium">🟢 Premium · ≥6 месеца + слаб сектор</h3>
+    <p class="attention-section-context">
+      <strong>+9.15% историческа excess за 63 дни</strong> · N=116 ·
+      CI [+4.30%, +13.99%] · Около 1 акция на месец.
+      <br>
+      Stable Winners, които са едновременно (а) в сектор с под-медиан momentum
+      и (б) поддържат лидерство ≥6 поредни анкернати ребаланса. Силен относителен
+      сигнал — акцията върви със собствени сили, не язди секторна вълна.
+    </p>
+    <div class="table-host" id="attention-premium-host"></div>
+
+    <h3 class="attention-section-title lonely">🔵 Lonely · стабилни в слаб сектор</h3>
+    <p class="attention-section-context">
+      <strong>+3.31% историческа excess за 63 дни</strong> · N=1170 · p&lt;0.0001 ·
+      Out-of-sample потвърдено (Train +2.7%, Test +4.0%).
+      <br>
+      Stable Winners в сектори с под-медиан momentum. Без изискване за tenure.
+      По-широка кохорта (10-20 акции по всяко време).
+    </p>
+    <div class="cs-toggle">
+      <label>
+        <input type="checkbox" id="attention-cs-toggle">
+        Покажи и Consumer Staples (скрит по подразбиране · -1.60% historical, p=0.037)
+      </label>
+    </div>
+    <div class="table-host" id="attention-lonely-host"></div>
+
+    <h3 class="attention-section-title normal">⚪ Normal SW · стабилни в силен сектор</h3>
+    <p class="attention-section-context">
+      <strong>+0.31% historical excess</strong> · информация за пълнота. Сравни с Lonely (+3.31%) —
+      същата квадрант категория, но с тривиален edge защото секторният тренд върши работата вместо
+      индивидуалния моментум.
+    </p>
+    <div class="table-host" id="attention-normal-host"></div>
+
+    <div class="disclaimer-box">
+      <strong>Важно — четете преди да действате</strong>
+      <p>
+        Това <em>не е</em> trading signal. Curated attention list — посока на внимание,
+        не препоръка за покупка.
+        ~50% hit rate в Premium кохортата означава, че половината акции <em>губят</em> пари
+        в следващите 63 дни. Mean доходността идва от победителите, не от средата.
+        Винаги правете собствено <strong>fundamental due diligence</strong>.
+      </p>
+    </div>
+
+    <div class="export-bar"><button class="export-btn" data-export="attention">📥 Export to Excel</button></div>
+  </section>
+
+  <section id="stable-winners-1m" class="view">
     <h2>🎯 Stable Winners — Лидери, които продължават да водят (1m)</h2>
     <p class="view-desc">
       Акции с <strong>висока база</strong> (топ 20% последните 6 месеца) и <strong>положителна ΔRank</strong> в последния месец.
