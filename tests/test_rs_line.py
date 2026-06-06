@@ -27,8 +27,12 @@ from src.rs_line import (
 
 
 def _make_dates(n: int) -> pd.DatetimeIndex:
-    """Връща `n` business days, завършващи днес."""
-    return pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=n)
+    """Връща точно `n` business days с фиксиран край (детерминистично).
+
+    Фиксиран `end` + explicit `periods=` гарантира `len == n` независимо от
+    текущата дата / pandas версия (срв. tests/test_signal_engine.py).
+    """
+    return pd.bdate_range(end="2024-12-31", periods=n)
 
 
 def _flat_benchmark(n: int = 300) -> pd.Series:
