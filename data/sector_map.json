@@ -311,6 +311,11 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Multi-Sector Holdings"
     },
+    "BRK.B": {
+      "name": "Berkshire Hathaway",
+      "gics_sector": "Financials",
+      "gics_sub_industry": "Multi-Sector Holdings"
+    },
     "BBY": {
       "name": "Best Buy",
       "gics_sector": "Consumer Discretionary",
@@ -382,6 +387,11 @@
       "gics_sub_industry": "Insurance Brokers"
     },
     "BF-B": {
+      "name": "Brown–Forman",
+      "gics_sector": "Consumer Staples",
+      "gics_sub_industry": "Distillers & Vintners"
+    },
+    "BF.B": {
       "name": "Brown–Forman",
       "gics_sector": "Consumer Staples",
       "gics_sub_industry": "Distillers & Vintners"

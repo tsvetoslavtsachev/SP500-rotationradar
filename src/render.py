@@ -534,12 +534,18 @@ def render_dashboard_data(
             },
             "scoring": "pure 12-1 momentum + GICS-sector-relative z-score",
             "backtest_summary": {
-                "stable_winners_excess_63d": "+3.34%",
-                "quality_dip_excess_63d": "+1.72%",
-                "faded_bounces_excess_63d": "-0.44%",
-                "tested_period": "2022-04 to 2025-10",
-                "rebalance_count": 42,
-                "caveat": "survivorship bias positive; current SP500 universe used historically",
+                # Честно преизмерено 2026-07-07 (membership-filtered TR панел, месечни
+                # ребаланси, block-bootstrap значимост) — _rotation_twins_analytics/
+                # C-EMPIRICS.md §T2. Старите in-sample +3.34/+1.72/−0.44 бяха надути
+                # (дневно припокриване, price-vs-TR, без членски филтър) и не се пре-смятаха.
+                "stable_winners_excess_63d": "+1.30% (1m) / +1.47% (3m), t 2.37/2.16 — единствен значим; режимно-зависим (2022: −0.62%)",
+                "quality_dip_excess_63d": "+0.36% (1m) / +0.04% (3m), t 0.62/0.09 — незначим (дескриптивен, не buy-point)",
+                "faded_bounces_excess_63d": "−0.25% (1m) / −0.30% (3m) — слаб отрицателен",
+                "chronic_losers_excess_63d": "шум (−0.17% до +0.17%)",
+                "tested_period": "2021-06 to 2026-03 (N=57–58 месечни срезa, ~5г, един режимен цикъл)",
+                "rebalance_count": 58,
+                "caveat": "SP500 membership-filtered (pre-inclusion махнат, delisting не → лек survivorship таван); сигналът е режимно-зависим",
+                "source": "_rotation_twins_analytics/C-EMPIRICS.md §T2 (2026-07-07)",
             },
         },
         "stable_winners_1m": _with_trajectory(stable_winners_1m),
