@@ -11,13 +11,14 @@
 <header>
   <h1>SP500 Rotation Radar</h1>
   <p class="tagline">
-    "<strong>Купи лидерите, особено когато временно отслабнат.</strong>" —
-    <em>не "хвани падналите ангели"</em>.
+    <strong>Наблюдавай лидерите — особено когато временно отслабнат.</strong>
+    <em>Радар за относителна сила ВЪТРЕ в сектора, не сигнал за покупка.</em>
     <br>
     <small>
-      Backtest 2022-2025 показва: <strong>Stable Winners +3.34% excess</strong> на 3-месечен horizon,
-      <strong>Quality Dip +1.72%</strong>, Faded Bounces −0.44%.
-      Mean reversion на quality > momentum bottom-fishing.
+      Честно преизмерено (2026-07-07, membership-filtered TR, месечни ребаланси): само
+      <strong>Stable Winners</strong> е значим — <strong>+1.30% (1m) / +1.47% (3m) excess fwd_63d</strong>
+      (t 2.37/2.16), но <strong>режимно-зависим</strong> (2022: −0.62%). Quality Dip +0.36%/+0.04%
+      (t 0.62/0.09) е незначим. Старите +3.34/+1.72 бяха надути in-sample числа.
     </small>
   </p>
   <div id="metadata" class="metadata"></div>
@@ -46,17 +47,17 @@
     <p class="view-desc">
       <strong>Силни акции в относително слаби сектори.</strong> Виж ги, после провери финансите им.
       <br>
-      Базирано на 10-годишен бектест (2016-2026, 53,627 ticker-month observations,
-      out-of-sample 2022-2025). Empirically validated layer върху съществуващата
-      Stable Winners класификация.
+      Базирано на 10-годишен in-sample бектест (2016-2026). ⚠ Тези числа НЕ са преизмерени
+      от одита 2026-07 (той провери квадрантите, не Attention кохортите) — третирай ги като
+      исторически/дескриптивни, не като валидиран forward edge. Слой върху Stable Winners класификацията.
     </p>
 
     <div class="attention-meta" id="attention-meta"></div>
 
     <h3 class="attention-section-title premium">🟢 Premium · ≥6 месеца + слаб сектор</h3>
     <p class="attention-section-context">
-      <strong>+9.15% историческа excess за 63 дни</strong> · N=116 ·
-      CI [+4.30%, +13.99%] · Около 1 акция на месец.
+      <strong>+9.15% in-sample excess за 63 дни</strong> · N=116 · in-sample CI [+4.30%, +13.99%] ·
+      Около 1 акция на месец. <em>(еднократен бектест, не пре-смятан, непреизмерен от одита 2026-07)</em>
       <br>
       Stable Winners, които са едновременно (а) в сектор с под-медиан momentum
       и (б) поддържат лидерство ≥6 поредни анкернати ребаланса. Силен относителен
@@ -66,8 +67,8 @@
 
     <h3 class="attention-section-title lonely">🔵 Lonely · стабилни в слаб сектор</h3>
     <p class="attention-section-context">
-      <strong>+3.31% историческа excess за 63 дни</strong> · N=1170 · p&lt;0.0001 ·
-      Out-of-sample потвърдено (Train +2.7%, Test +4.0%).
+      <strong>+3.31% in-sample excess за 63 дни</strong> · N=1170 · „p&lt;0.0001" е in-sample ·
+      <em>еднократен бектест, не пре-смятан, непреизмерен независимо от одита 2026-07.</em>
       <br>
       Stable Winners в сектори с под-медиан momentum. Без изискване за tenure.
       По-широка кохорта (10-20 акции по всяко време).
@@ -106,7 +107,8 @@
     <h2>🎯 Stable Winners — Лидери, които продължават да водят (1m)</h2>
     <p class="view-desc">
       Акции с <strong>висока база</strong> (топ 20% последните 6 месеца) и <strong>положителна ΔRank</strong> в последния месец.
-      Това е главният сигнал — backtest +3.34% excess на 63d horizon, hit rate 53.2%.
+      Това е единственият значим квадрант — честно преизмерено +1.30% (1m) / +1.47% (3m) excess fwd_63d
+      (t 2.37/2.16), но режимно-зависим (2022: −0.62%). Старото „+3.34%" беше надуто in-sample.
       Лидерството не отстъпва. Тук е ровенето.
     </p>
     <div class="table-host"></div>
@@ -124,7 +126,8 @@
     <h2>💎 Quality Dip — Лидери временно отслабнали (1m)</h2>
     <p class="view-desc">
       Акции с <strong>висока база</strong> (топ 20% последните 6 месеца) и <strong>отрицателна ΔRank</strong> наскоро.
-      Backtest +1.72% excess на 63d horizon, hit rate 49.6%. Mean reversion обикновено връща.
+      Честно преизмерено: +0.36% (1m) / +0.04% (3m) excess fwd_63d (t 0.62/0.09) — <strong>незначимо</strong>.
+      Наблюдение за отслабване, не buy-point; рафтът често държи вече-обърнати имена ~9 седмици (T3). Старото „+1.72%" беше надуто in-sample.
       <br>
       <strong>Cross-check:</strong> провери "Abs %ile" колоната — ако е под 50, акцията е sector-relative силна
       но абсолютно слаба (best of bad sector), което може да е chronic decline, не Quality Dip.
@@ -144,7 +147,7 @@
     <h2>⚠ Faded Bounces — какво да не гониш (1m)</h2>
     <p class="view-desc">
       Акции с <strong>ниска база</strong> (под p20 последните 6 месеца) и <strong>скорошен скок</strong>.
-      Изглеждат като turnaround candidates — но backtest показа <strong>−0.44% excess</strong> на 63d horizon, hit rate 44.7%.
+      Изглеждат като turnaround candidates — но честно преизмерено дават <strong>−0.25% (1m) / −0.30% (3m) excess</strong> fwd_63d (слаб отрицателен).
       Падналите ангели рядко се възстановяват. Тук е contra-list — какво да НЕ купиш.
     </p>
     <div class="table-host"></div>
@@ -188,7 +191,7 @@
     <h2>⚡ Power Confluence — Stable Winner × Fresh Bullish RS Crossover</h2>
     <p class="view-desc">
       Пресичане на двата сигнала: <strong>Stable Winner</strong> (висока 6м база + положителна ΔRank,
-      backtest +3.34% excess fwd_63d) <strong>И</strong> <strong>fresh bullish RS crossover</strong>
+      честно +1.30/+1.47% excess fwd_63d, режимно-зависим) <strong>И</strong> <strong>fresh bullish RS crossover</strong>
       (timing trigger в последните 5 дни). Stable Winners сами по себе си са proven; добавянето на
       RS crossover overlay дава точкова timing entry.
     </p>

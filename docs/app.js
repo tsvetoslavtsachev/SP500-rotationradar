@@ -90,10 +90,10 @@ function renderAttention(layer) {
     const lonelyVisible = lonely.length - csCount;
     meta.innerHTML = `
       <span>📅 Ребаланс: <strong>${layer.latest_date ?? "—"}</strong></span>
-      <span class="pill premium"><strong>${premium.length}</strong> Premium (+9.15% hist.)</span>
-      <span class="pill lonely"><strong>${lonelyVisible}</strong> Lonely (+3.31% hist.)
+      <span class="pill premium"><strong>${premium.length}</strong> Premium (+9.15% in-sample)</span>
+      <span class="pill lonely"><strong>${lonelyVisible}</strong> Lonely (+3.31% in-sample)
         ${csCount ? `<small style="color:var(--text-dim)"> + ${csCount} CS скрити</small>` : ""}</span>
-      <span class="pill normal"><strong>${normal.length}</strong> Normal SW (+0.31% hist.)</span>
+      <span class="pill normal"><strong>${normal.length}</strong> Normal SW (+0.31% in-sample)</span>
       <span><strong>${tickers.length}</strong> SW общо</span>
     `;
   }

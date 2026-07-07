@@ -1,13 +1,18 @@
 """
 Attention layer — Lonely Strength + Premium cohorts.
 
-Empirically validated on 10y backtest 2016-2026:
+⚠ ЧЕСТНОСТ (2026-07-07 rotation-twins одит): числата по-долу са от ЕДНОКРАТЕН
+in-sample бектест (2016-2026), НЕ се пре-смятат и НЕ са преизмерени независимо от
+одита (C-EMPIRICS §T2 преизмери само квадрантите, не Attention кохортите). Третирай
+ги като дескриптивни/исторически, не като валидиран forward edge; „p<0.0001" е
+in-sample. Независима преизмерка на Attention слоя = отделен research въпрос (Пакет 3).
+
+Оригинални (непреизмерени) числа от 10y backtest 2016-2026:
 - Lonely SW (SW in sector with below-median momentum): +3.31% mean excess 63d,
-  N=1170, p<0.0001, confirmed out-of-sample.
+  N=1170 (in-sample p<0.0001).
 - Premium (Lonely × ≥6 consecutive months as SW): +9.15% mean excess (N=116,
-  CI [+4.30%, +13.99%]).
-- Consumer Staples SW underperform structurally (-1.60%, p=0.037, N=246) —
-  excluded by default.
+  in-sample CI [+4.30%, +13.99%]).
+- Consumer Staples SW underperform structurally (-1.60%, N=246) — excluded by default.
 
 These signals identify stocks where the market shows persistent leadership
 despite a lagging sector — typically the "AMD-like" story. The layer is
