@@ -3,6 +3,69 @@
 
 // Държи текущите данни за всеки tab — за Excel export-а.
 // За tabs с filters (rank-all, screener), стойността е CURRENT FILTERED set.
+// Речник — обяснение на всяка колона НА МЯСТО (ФОРМА-КАНОН §1, правило 3).
+// Ключ = data-key на колоната; стойност = човешка подсказка (native title tooltip).
+const COLUMN_TIPS = {
+  ticker: "Борсов код. Клик отваря външния профил на компанията (Finviz).",
+  symbol: "Секторен SPDR ETF (напр. XLK = технологии). Клик отваря външния профил (Finviz).",
+  name: "Име на компанията / сектора.",
+  sector: "GICS сектор — към кой отрасъл спада компанията.",
+  sub_industry: "GICS под-индустрия — по-фина категория вътре в сектора.",
+  abs_strength: "Абсолютен 12-1 моментум като percentile 0-100: колко силна е 11-месечната доходност спрямо целия пазар (100 = най-силна). По-силният предиктор.",
+  mom_12_1_pct: "Реалната 11-месечна доходност (12-1: последните 12 месеца без най-скорошния). Действително число, не percentile.",
+  current_rank: "Секторно-неутрален ранг 0-100: лидер ли е ВЪТРЕ в сектора си, изчистено от общата секторна вълна. По-слаб предиктор от абсолютния.",
+  base_rank_6m: "Средният секторен ранг за месеци 6-1 назад — 'базата' / рафтът. Висока база = устойчив лидер, не еднодневка.",
+  delta_1m: "Промяна (Δ) на ранга спрямо преди ~21 търговски дни (1 месец). Плюс = засилва се, минус = отслабва.",
+  delta_3m: "Промяна (Δ) на ранга спрямо преди ~63 търговски дни (3 месеца). Плюс = засилва се, минус = отслабва.",
+  trajectory: "Линията на ранга през последните ~90 търговски дни (рангът, НЕ доходността). Нагоре = засилващ се ранг.",
+  score: "Композитен резултат за подреждане (sector-relative percentile). По-висок = по-напред в класацията.",
+  rank_position: "Позиция в подреждането. 1 = най-отпред.",
+  rank_index: "Позиция в подреждането. 1 = най-отпред.",
+  quadrant_1m: "Квадрант (1м): Stable Winner = силен и се засилва · Quality Dip = силен, но отслабва · Faded Bounce = слаб, но подскочи · Chronic Loser = слаб и отслабва.",
+  quadrant_3m: "Квадрант (3м): същата логика, но на 3-месечен прозорец.",
+  sw_streak: "Колко поредни месечни ребаланса акцията остава Stable Winner. По-дълга серия = по-устойчиво лидерство.",
+  sector_avg_rank: "Среден ранг на сектора наоколо — колко силен/слаб е самият сектор.",
+  market_cap_m: "Пазарна капитализация (в млн. $).",
+  size_bucket: "Размер по капитализация: Large / Mid / Small.",
+  ret_1m: "Ценова доходност за 1 месец.",
+  ret_3m: "Ценова доходност за 3 месеца.",
+  ret_6m: "Ценова доходност за 6 месеца.",
+  ret_ytd: "Ценова доходност от началото на годината.",
+  ret_1y: "Ценова доходност за 1 година.",
+  ret_3y: "Ценова доходност за 3 години.",
+  ret_5y: "Ценова доходност за 5 години.",
+  vol_1y: "Годишна волатилност — колебливостта на дневните доходности, анюализирана. По-високо = по-люлеещо.",
+  sharpe_1y: "Sharpe (1г): доходност на единица риск (доходност ÷ волатилност). По-високо = по-добре платен риск.",
+  sharpe_3y: "Sharpe (3г): доходност на единица риск.",
+  maxdd_1y: "Максимален drawdown (1г): най-голямото падане от връх до дъно.",
+  maxdd_3y: "Максимален drawdown (3г): най-голямото падане от връх до дъно.",
+  maxdd_5y: "Максимален drawdown (5г): най-голямото падане от връх до дъно.",
+  calmar_3y: "Calmar (3г): доходност ÷ максимален drawdown. Възвръщаемост спрямо най-лошото падане.",
+  dist_52w_high: "Разстояние до 52-седмичния връх. 0% = на върха; -20% = 20% под върха.",
+  days_since_52w_high: "Дни от последния 52-седмичен връх.",
+  beta_1y: "Бета (1г) спрямо индекса: колко се движи спрямо пазара. 1 = като пазара, >1 = по-рязко.",
+  price: "Последна цена.",
+  pct_from_52w_high: "Разстояние до 52-седмичния връх (%).",
+  rs_value: "Relative Strength линия = цена на акцията ÷ цена на SPY. Расте, когато акцията изпреварва пазара.",
+  cloud_color: "Цвят на RS-облака: зелено = RS над средните си (10 EMA над 50 SMA), червено = под тях.",
+  days_since_crossover: "Дни от последното пресичане на RS-линията през пълзящите ѝ средни (10 EMA / 50 SMA).",
+  rs_slope_norm: "Наклон на RS-линията (нормализиран). Плюс = ускорява изпреварването на пазара.",
+  trend_quality: "Качество на тренда (✓ = чист възходящ RS-тренд).",
+  rs_trajectory: "RS-линията през последните ~90 търговски дни.",
+  rs_score: "Резултат само по RS-компонента (timing).",
+  combined_score: "Комбиниран резултат: Stable Winner × свеж bullish RS crossover.",
+  rs_new_high: "★ = RS-линията на сектора е на нов 52-седмичен връх.",
+  stocks_n_risers: "Брой акции ВЪТРЕ в сектора с положителна ΔRank (засилващи се).",
+  stocks_n_decayers: "Брой акции ВЪТРЕ в сектора с отрицателна ΔRank (отслабващи).",
+};
+
+// Слага native tooltip + hover-affordance на header по неговия data-key.
+function applyColTip(th) {
+  if (!th || th.title) return;
+  const tip = COLUMN_TIPS[th.dataset.key];
+  if (tip) { th.title = tip; th.classList.add("has-tip"); }
+}
+
 const exportState = {
   asOf: null,
   "attention": [],
@@ -169,7 +232,7 @@ function renderAttentionTable(hostId, rows, opts = {}) {
       const v = row[h.key];
 
       if (h.key === "ticker") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
         if (row.is_cs_excluded) {
           td.innerHTML += '<span class="cs-tag">CS</span>';
         }
@@ -256,7 +319,7 @@ function buildTbody(rows, headers) {
     headers.forEach((h) => {
       const td = document.createElement("td");
       if (h.key === "ticker") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
       } else if (h.key === "trajectory") {
         td.appendChild(makeTrajectorySVG(row.trajectory));
       } else if (h.key.startsWith("delta_")) {
@@ -378,7 +441,7 @@ function renderCurrentStrength(viewId, rows) {
         td.textContent = idx + 1;
         td.dataset.value = idx + 1;
       } else if (h.key === "ticker") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
       } else if (h.key === "trajectory") {
         td.appendChild(makeTrajectorySVG(row.trajectory));
       } else if (h.key === "mom_12_1_pct") {
@@ -422,12 +485,12 @@ function renderHeatmap(viewId, sectors) {
   const header = document.createElement("div");
   header.className = "heatmap-row header";
   header.innerHTML = `
-    <div>Sector</div>
-    <div style="text-align:center">Δ 1m</div>
-    <div style="text-align:center">Δ 3m</div>
-    <div style="text-align:center">Total</div>
-    <div style="text-align:center">Risers</div>
-    <div style="text-align:center">Decayers</div>
+    <div title="GICS сектор.">Sector</div>
+    <div style="text-align:center" title="Средна промяна (Δ) на интрасекторния ранг спрямо преди ~21 търговски дни (1 месец). Плюс = секторът се засилва отвътре.">Δ 1m</div>
+    <div style="text-align:center" title="Средна промяна (Δ) на интрасекторния ранг спрямо преди ~63 търговски дни (3 месеца).">Δ 3m</div>
+    <div style="text-align:center" title="Брой акции в сектора.">Total</div>
+    <div style="text-align:center" title="Брой акции с положителна ΔRank (засилващи се).">Risers</div>
+    <div style="text-align:center" title="Брой акции с отрицателна ΔRank (отслабващи).">Decayers</div>
   `;
   wrap.appendChild(header);
 
@@ -547,7 +610,7 @@ function renderRankAll(viewId, stocks) {
       return;
     }
     if (key === "ticker") {
-      td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${value}" target="_blank" rel="noopener">${value}</a>`;
+      td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${value}" target="_blank" rel="noopener">${value}</a>`;
       td.dataset.value = value;
       return;
     }
@@ -634,6 +697,7 @@ function renderRankAll(viewId, stocks) {
       th.textContent = h.label;
       th.dataset.col = idx;
       th.dataset.key = h.key;
+      applyColTip(th);
       if (currentSort.key === h.key) {
         th.classList.add(currentSort.desc ? "sort-desc" : "sort-asc");
       }
@@ -727,7 +791,7 @@ function renderScreener(viewId, screenerData) {
       return;
     }
     if (key === "ticker") {
-      td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${value}" target="_blank" rel="noopener">${value}</a>`;
+      td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${value}" target="_blank" rel="noopener">${value}</a>`;
       td.dataset.value = value;
       return;
     }
@@ -800,6 +864,7 @@ function renderScreener(viewId, screenerData) {
       th.dataset.col = idx;
       th.dataset.key = h.key;
       if (h.cls) th.classList.add(h.cls);
+      applyColTip(th);
       if (currentSort.key === h.key) {
         th.classList.add(currentSort.desc ? "sort-desc" : "sort-asc");
       }
@@ -926,7 +991,7 @@ function buildRSTable(rows, opts = {}) {
       const td = document.createElement("td");
       const v = row[h.key];
       if (h.key === "ticker") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
       } else if (h.key === "rs_trajectory") {
         td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
       } else if (h.key === "cloud_color") {
@@ -1046,7 +1111,7 @@ function renderPowerConfluence(viewId, rows) {
       const td = document.createElement("td");
       const v = row[h.key];
       if (h.key === "ticker") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.ticker}" target="_blank" rel="noopener">${row.ticker}</a>`;
       } else if (h.key === "rs_trajectory") {
         td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
       } else if (h.key === "delta_1m" || h.key === "mom_12_1_pct") {
@@ -1128,7 +1193,7 @@ function renderSectorRS(viewId, rows) {
       const td = document.createElement("td");
       const v = row[h.key];
       if (h.key === "symbol") {
-        td.innerHTML = `<a class="ticker" href="https://finance.yahoo.com/quote/${row.symbol}" target="_blank" rel="noopener">${row.symbol}</a>`;
+        td.innerHTML = `<a class="ticker" href="https://finviz.com/quote.ashx?t=${row.symbol}" target="_blank" rel="noopener">${row.symbol}</a>`;
       } else if (h.key === "rs_trajectory") {
         td.appendChild(makeRSTrajectorySVG(row.rs_trajectory));
       } else if (h.key === "cloud_color") {
@@ -1202,6 +1267,7 @@ function formatDelta(v) {
 function attachSorting(table, headers) {
   const ths = table.querySelectorAll("th");
   ths.forEach((th, idx) => {
+    applyColTip(th);
     th.addEventListener("click", () => {
       const desc = !th.classList.contains("sort-desc");
       ths.forEach((x) => x.classList.remove("sort-asc", "sort-desc"));
