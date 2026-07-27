@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-25T23:33:28",
+  "updated": "2026-07-27T23:04:49",
   "tickers": {
     "MMM": {
       "name": "3M",
@@ -311,11 +311,6 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Multi-Sector Holdings"
     },
-    "BRK.B": {
-      "name": "Berkshire Hathaway",
-      "gics_sector": "Financials",
-      "gics_sub_industry": "Multi-Sector Holdings"
-    },
     "BBY": {
       "name": "Best Buy",
       "gics_sector": "Consumer Discretionary",
@@ -346,7 +341,7 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Transaction & Payment Processing Services"
     },
-    "BK": {
+    "BNY": {
       "name": "BNY Mellon",
       "gics_sector": "Financials",
       "gics_sub_industry": "Asset Management & Custody Banks"
@@ -391,11 +386,6 @@
       "gics_sector": "Consumer Staples",
       "gics_sub_industry": "Distillers & Vintners"
     },
-    "BF.B": {
-      "name": "Brown–Forman",
-      "gics_sector": "Consumer Staples",
-      "gics_sub_industry": "Distillers & Vintners"
-    },
     "BLDR": {
       "name": "Builders FirstSource",
       "gics_sector": "Industrials",
@@ -426,11 +416,6 @@
       "gics_sector": "Real Estate",
       "gics_sub_industry": "Multi-Family Residential REITs"
     },
-    "CPB": {
-      "name": "Campbell's Company (The)",
-      "gics_sector": "Consumer Staples",
-      "gics_sub_industry": "Packaged Foods & Meats"
-    },
     "COF": {
       "name": "Capital One",
       "gics_sector": "Financials",
@@ -442,7 +427,7 @@
       "gics_sub_industry": "Health Care Distributors"
     },
     "CCL": {
-      "name": "Carnival",
+      "name": "Carnival Corporation",
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Hotels, Resorts & Cruise Lines"
     },
@@ -621,11 +606,6 @@
       "gics_sector": "Industrials",
       "gics_sub_industry": "Construction & Engineering"
     },
-    "CAG": {
-      "name": "Conagra Brands",
-      "gics_sector": "Consumer Staples",
-      "gics_sub_industry": "Packaged Foods & Meats"
-    },
     "COP": {
       "name": "ConocoPhillips",
       "gics_sector": "Energy",
@@ -680,11 +660,6 @@
       "name": "Costco",
       "gics_sector": "Consumer Staples",
       "gics_sub_industry": "Consumer Staples Merchandise Retail"
-    },
-    "CTRA": {
-      "name": "Coterra",
-      "gics_sector": "Energy",
-      "gics_sub_industry": "Oil & Gas Exploration & Production"
     },
     "CRH": {
       "name": "CRH plc",
@@ -841,7 +816,7 @@
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Broadline Retail"
     },
-    "SATS": {
+    "ECHO": {
       "name": "EchoStar",
       "gics_sector": "Communication Services",
       "gics_sub_industry": "Wireless Telecommunication Services"
@@ -890,11 +865,6 @@
       "name": "EOG Resources",
       "gics_sector": "Energy",
       "gics_sub_industry": "Oil & Gas Exploration & Production"
-    },
-    "EPAM": {
-      "name": "EPAM Systems",
-      "gics_sector": "Information Technology",
-      "gics_sub_industry": "IT Consulting & Other Services"
     },
     "EQT": {
       "name": "EQT Corporation",
@@ -1006,6 +976,11 @@
       "gics_sector": "Industrials",
       "gics_sub_industry": "Air Freight & Logistics"
     },
+    "FDXF": {
+      "name": "FedEx Freight",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Cargo Ground Transportation"
+    },
     "FIS": {
       "name": "Fidelity National Information Services",
       "gics_sector": "Financials",
@@ -1030,6 +1005,11 @@
       "name": "Fiserv",
       "gics_sector": "Financials",
       "gics_sub_industry": "Transaction & Payment Processing Services"
+    },
+    "FLEX": {
+      "name": "Flex Ltd.",
+      "gics_sector": "Information Technology",
+      "gics_sub_industry": "Electronic Manufacturing Services"
     },
     "F": {
       "name": "Ford Motor Company",
@@ -1099,7 +1079,7 @@
     "GNRC": {
       "name": "Generac",
       "gics_sector": "Industrials",
-      "gics_sub_industry": "Electrical Components & Equipment"
+      "gics_sub_industry": "Heavy Electrical Equipment"
     },
     "GD": {
       "name": "General Dynamics",
@@ -1196,8 +1176,13 @@
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Home Improvement Retail"
     },
+    "HONA": {
+      "name": "Honeywell Aerospace",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Aerospace & Defense"
+    },
     "HON": {
-      "name": "Honeywell",
+      "name": "Honeywell Technologies",
       "gics_sector": "Industrials",
       "gics_sub_industry": "Industrial Conglomerates"
     },
@@ -1525,6 +1510,11 @@
       "name": "Martin Marietta Materials",
       "gics_sector": "Materials",
       "gics_sub_industry": "Construction Materials"
+    },
+    "MRVL": {
+      "name": "Marvell Technology",
+      "gics_sector": "Information Technology",
+      "gics_sub_industry": "Semiconductors"
     },
     "MAS": {
       "name": "Masco",
@@ -1865,11 +1855,6 @@
       "name": "PNC Financial Services",
       "gics_sector": "Financials",
       "gics_sub_industry": "Diversified Banks"
-    },
-    "POOL": {
-      "name": "Pool Corporation",
-      "gics_sector": "Consumer Discretionary",
-      "gics_sub_industry": "Distributors"
     },
     "PPG": {
       "name": "PPG Industries",
@@ -2340,6 +2325,11 @@
       "name": "Valero Energy",
       "gics_sector": "Energy",
       "gics_sub_industry": "Oil & Gas Refining & Marketing"
+    },
+    "VEEV": {
+      "name": "Veeva Systems",
+      "gics_sector": "Health Care",
+      "gics_sub_industry": "Health Care Technology"
     },
     "VTR": {
       "name": "Ventas",
