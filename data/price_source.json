@@ -413,7 +413,6 @@
     "SOLV": "base",
     "SPG": "base",
     "SPGI": "base",
-    "SPY": "base",
     "SRE": "base",
     "STE": "base",
     "STLD": "base",
@@ -497,17 +496,6 @@
     "WY": "base",
     "WYNN": "base",
     "XEL": "base",
-    "XLB": "base",
-    "XLC": "base",
-    "XLE": "base",
-    "XLF": "base",
-    "XLI": "base",
-    "XLK": "base",
-    "XLP": "base",
-    "XLRE": "base",
-    "XLU": "base",
-    "XLV": "base",
-    "XLY": "base",
     "XOM": "base",
     "XYL": "base",
     "XYZ": "base",
@@ -518,8 +506,8 @@
   },
   "summary": {
     "expected": 515,
-    "covered": 515,
-    "base": 512,
+    "covered": 503,
+    "base": 500,
     "fetch": 3
   }
 }
