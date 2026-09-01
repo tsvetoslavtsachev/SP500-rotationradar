@@ -104020,405 +104020,22 @@
   ],
   "sector_rs": [
     {
-      "symbol": "XLB",
-      "name": "Materials",
-      "gics_sector": "Materials",
-      "price": 53.18,
-      "rs_value": 0.0691,
-      "cloud_color": "green",
-      "bullish_crossover": true,
-      "bearish_crossover": false,
-      "days_since_crossover": 4,
-      "rs_new_high": false,
-      "rs_slope_norm": 0.0149,
-      "score": 61.9,
-      "stocks_n_risers": 3,
-      "stocks_n_decayers": 3,
-      "stocks_n_total": 26,
-      "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.072876
-        },
-        {
-          "date": "2026-04-23",
-          "rs": 0.073131
-        },
-        {
-          "date": "2026-04-24",
-          "rs": 0.072723
-        },
-        {
-          "date": "2026-04-27",
-          "rs": 0.072402
-        },
-        {
-          "date": "2026-04-28",
-          "rs": 0.072222
-        },
-        {
-          "date": "2026-04-29",
-          "rs": 0.071615
-        },
-        {
-          "date": "2026-04-30",
-          "rs": 0.071619
-        },
-        {
-          "date": "2026-05-01",
-          "rs": 0.071255
-        },
-        {
-          "date": "2026-05-04",
-          "rs": 0.070542
-        },
-        {
-          "date": "2026-05-05",
-          "rs": 0.071197
-        },
-        {
-          "date": "2026-05-06",
-          "rs": 0.07142
-        },
-        {
-          "date": "2026-05-07",
-          "rs": 0.070259
-        },
-        {
-          "date": "2026-05-08",
-          "rs": 0.069941
-        },
-        {
-          "date": "2026-05-11",
-          "rs": 0.070688
-        },
-        {
-          "date": "2026-05-12",
-          "rs": 0.070633
-        },
-        {
-          "date": "2026-05-13",
-          "rs": 0.070132
-        },
-        {
-          "date": "2026-05-14",
-          "rs": 0.069062
-        },
-        {
-          "date": "2026-05-15",
-          "rs": 0.068049
-        },
-        {
-          "date": "2026-05-18",
-          "rs": 0.067989
-        },
-        {
-          "date": "2026-05-19",
-          "rs": 0.066837
-        },
-        {
-          "date": "2026-05-20",
-          "rs": 0.067076
-        },
-        {
-          "date": "2026-05-21",
-          "rs": 0.067347
-        },
-        {
-          "date": "2026-05-22",
-          "rs": 0.067445
-        },
-        {
-          "date": "2026-05-26",
-          "rs": 0.067933
-        },
-        {
-          "date": "2026-05-27",
-          "rs": 0.068198
-        },
-        {
-          "date": "2026-05-28",
-          "rs": 0.068063
-        },
-        {
-          "date": "2026-05-29",
-          "rs": 0.067616
-        },
-        {
-          "date": "2026-06-01",
-          "rs": 0.067129
-        },
-        {
-          "date": "2026-06-02",
-          "rs": 0.067828
-        },
-        {
-          "date": "2026-06-03",
-          "rs": 0.068453
-        },
-        {
-          "date": "2026-06-04",
-          "rs": 0.068182
-        },
-        {
-          "date": "2026-06-05",
-          "rs": 0.068646
-        },
-        {
-          "date": "2026-06-08",
-          "rs": 0.067585
-        },
-        {
-          "date": "2026-06-09",
-          "rs": 0.068883
-        },
-        {
-          "date": "2026-06-10",
-          "rs": 0.068373
-        },
-        {
-          "date": "2026-06-11",
-          "rs": 0.069426
-        },
-        {
-          "date": "2026-06-12",
-          "rs": 0.070528
-        },
-        {
-          "date": "2026-06-15",
-          "rs": 0.069472
-        },
-        {
-          "date": "2026-06-16",
-          "rs": 0.070181
-        },
-        {
-          "date": "2026-06-17",
-          "rs": 0.070125
-        },
-        {
-          "date": "2026-06-18",
-          "rs": 0.069123
-        },
-        {
-          "date": "2026-06-22",
-          "rs": 0.069345
-        },
-        {
-          "date": "2026-06-23",
-          "rs": 0.069345
-        },
-        {
-          "date": "2026-06-24",
-          "rs": 0.069773
-        },
-        {
-          "date": "2026-06-25",
-          "rs": 0.070598
-        },
-        {
-          "date": "2026-06-26",
-          "rs": 0.070783
-        },
-        {
-          "date": "2026-06-29",
-          "rs": 0.068367
-        },
-        {
-          "date": "2026-06-30",
-          "rs": 0.068066
-        },
-        {
-          "date": "2026-07-01",
-          "rs": 0.068413
-        },
-        {
-          "date": "2026-07-02",
-          "rs": 0.069833
-        },
-        {
-          "date": "2026-07-06",
-          "rs": 0.069189
-        },
-        {
-          "date": "2026-07-07",
-          "rs": 0.06889
-        },
-        {
-          "date": "2026-07-08",
-          "rs": 0.067293
-        },
-        {
-          "date": "2026-07-09",
-          "rs": 0.066861
-        },
-        {
-          "date": "2026-07-10",
-          "rs": 0.067408
-        },
-        {
-          "date": "2026-07-13",
-          "rs": 0.067515
-        },
-        {
-          "date": "2026-07-14",
-          "rs": 0.067356
-        },
-        {
-          "date": "2026-07-15",
-          "rs": 0.066904
-        },
-        {
-          "date": "2026-07-16",
-          "rs": 0.067788
-        },
-        {
-          "date": "2026-07-17",
-          "rs": 0.067982
-        },
-        {
-          "date": "2026-07-20",
-          "rs": 0.067418
-        },
-        {
-          "date": "2026-07-21",
-          "rs": 0.066954
-        },
-        {
-          "date": "2026-07-22",
-          "rs": 0.067995
-        },
-        {
-          "date": "2026-07-23",
-          "rs": 0.068127
-        },
-        {
-          "date": "2026-07-24",
-          "rs": 0.069371
-        },
-        {
-          "date": "2026-07-27",
-          "rs": 0.069531
-        },
-        {
-          "date": "2026-07-28",
-          "rs": 0.070648
-        },
-        {
-          "date": "2026-07-29",
-          "rs": 0.070929
-        },
-        {
-          "date": "2026-07-30",
-          "rs": 0.069625
-        },
-        {
-          "date": "2026-07-31",
-          "rs": 0.067507
-        },
-        {
-          "date": "2026-08-03",
-          "rs": 0.067325
-        },
-        {
-          "date": "2026-08-04",
-          "rs": 0.067416
-        },
-        {
-          "date": "2026-08-05",
-          "rs": 0.068382
-        },
-        {
-          "date": "2026-08-06",
-          "rs": 0.06788
-        },
-        {
-          "date": "2026-08-07",
-          "rs": 0.06836
-        },
-        {
-          "date": "2026-08-10",
-          "rs": 0.068794
-        },
-        {
-          "date": "2026-08-11",
-          "rs": 0.069093
-        },
-        {
-          "date": "2026-08-12",
-          "rs": 0.068066
-        },
-        {
-          "date": "2026-08-13",
-          "rs": 0.067247
-        },
-        {
-          "date": "2026-08-14",
-          "rs": 0.067677
-        },
-        {
-          "date": "2026-08-17",
-          "rs": 0.06761
-        },
-        {
-          "date": "2026-08-18",
-          "rs": 0.06747
-        },
-        {
-          "date": "2026-08-19",
-          "rs": 0.068291
-        },
-        {
-          "date": "2026-08-20",
-          "rs": 0.068739
-        },
-        {
-          "date": "2026-08-21",
-          "rs": 0.069921
-        },
-        {
-          "date": "2026-08-24",
-          "rs": 0.07018
-        },
-        {
-          "date": "2026-08-25",
-          "rs": 0.069956
-        },
-        {
-          "date": "2026-08-26",
-          "rs": 0.070058
-        },
-        {
-          "date": "2026-08-27",
-          "rs": 0.069031
-        },
-        {
-          "date": "2026-08-28",
-          "rs": 0.069123
-        }
-      ]
-    },
-    {
       "symbol": "XLE",
       "name": "Energy",
       "gics_sector": "Energy",
-      "price": 62.68,
-      "rs_value": 0.0815,
+      "price": 63.96,
+      "rs_value": 0.0834,
       "cloud_color": "green",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.0419,
-      "score": 47.6,
+      "rs_slope_norm": 0.04,
+      "score": 47.0,
       "stocks_n_risers": 3,
       "stocks_n_decayers": 2,
       "stocks_n_total": 21,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.079498
-        },
         {
           "date": "2026-04-23",
           "rs": 0.080429
@@ -104774,6 +104391,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.081471
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.083384
         }
       ]
     },
@@ -104781,23 +104402,19 @@
       "symbol": "XLV",
       "name": "Health Care",
       "gics_sector": "Health Care",
-      "price": 171.16,
-      "rs_value": 0.2225,
+      "price": 170.54,
+      "rs_value": 0.2223,
       "cloud_color": "green",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.0348,
-      "score": 45.5,
+      "rs_slope_norm": 0.0337,
+      "score": 45.1,
       "stocks_n_risers": 3,
       "stocks_n_decayers": 4,
       "stocks_n_total": 58,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.205818
-        },
         {
           "date": "2026-04-23",
           "rs": 0.206422
@@ -105153,6 +104770,389 @@
         {
           "date": "2026-08-28",
           "rs": 0.222474
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.222332
+        }
+      ]
+    },
+    {
+      "symbol": "XLB",
+      "name": "Materials",
+      "gics_sector": "Materials",
+      "price": 52.69,
+      "rs_value": 0.0687,
+      "cloud_color": "green",
+      "bullish_crossover": false,
+      "bearish_crossover": false,
+      "days_since_crossover": null,
+      "rs_new_high": false,
+      "rs_slope_norm": 0.015,
+      "score": 39.5,
+      "stocks_n_risers": 3,
+      "stocks_n_decayers": 3,
+      "stocks_n_total": 26,
+      "rs_trajectory": [
+        {
+          "date": "2026-04-23",
+          "rs": 0.073131
+        },
+        {
+          "date": "2026-04-24",
+          "rs": 0.072723
+        },
+        {
+          "date": "2026-04-27",
+          "rs": 0.072402
+        },
+        {
+          "date": "2026-04-28",
+          "rs": 0.072222
+        },
+        {
+          "date": "2026-04-29",
+          "rs": 0.071615
+        },
+        {
+          "date": "2026-04-30",
+          "rs": 0.071619
+        },
+        {
+          "date": "2026-05-01",
+          "rs": 0.071255
+        },
+        {
+          "date": "2026-05-04",
+          "rs": 0.070542
+        },
+        {
+          "date": "2026-05-05",
+          "rs": 0.071197
+        },
+        {
+          "date": "2026-05-06",
+          "rs": 0.07142
+        },
+        {
+          "date": "2026-05-07",
+          "rs": 0.070259
+        },
+        {
+          "date": "2026-05-08",
+          "rs": 0.069941
+        },
+        {
+          "date": "2026-05-11",
+          "rs": 0.070688
+        },
+        {
+          "date": "2026-05-12",
+          "rs": 0.070633
+        },
+        {
+          "date": "2026-05-13",
+          "rs": 0.070132
+        },
+        {
+          "date": "2026-05-14",
+          "rs": 0.069062
+        },
+        {
+          "date": "2026-05-15",
+          "rs": 0.068049
+        },
+        {
+          "date": "2026-05-18",
+          "rs": 0.067989
+        },
+        {
+          "date": "2026-05-19",
+          "rs": 0.066837
+        },
+        {
+          "date": "2026-05-20",
+          "rs": 0.067076
+        },
+        {
+          "date": "2026-05-21",
+          "rs": 0.067347
+        },
+        {
+          "date": "2026-05-22",
+          "rs": 0.067445
+        },
+        {
+          "date": "2026-05-26",
+          "rs": 0.067933
+        },
+        {
+          "date": "2026-05-27",
+          "rs": 0.068198
+        },
+        {
+          "date": "2026-05-28",
+          "rs": 0.068063
+        },
+        {
+          "date": "2026-05-29",
+          "rs": 0.067616
+        },
+        {
+          "date": "2026-06-01",
+          "rs": 0.067129
+        },
+        {
+          "date": "2026-06-02",
+          "rs": 0.067828
+        },
+        {
+          "date": "2026-06-03",
+          "rs": 0.068453
+        },
+        {
+          "date": "2026-06-04",
+          "rs": 0.068182
+        },
+        {
+          "date": "2026-06-05",
+          "rs": 0.068646
+        },
+        {
+          "date": "2026-06-08",
+          "rs": 0.067585
+        },
+        {
+          "date": "2026-06-09",
+          "rs": 0.068883
+        },
+        {
+          "date": "2026-06-10",
+          "rs": 0.068373
+        },
+        {
+          "date": "2026-06-11",
+          "rs": 0.069426
+        },
+        {
+          "date": "2026-06-12",
+          "rs": 0.070528
+        },
+        {
+          "date": "2026-06-15",
+          "rs": 0.069472
+        },
+        {
+          "date": "2026-06-16",
+          "rs": 0.070181
+        },
+        {
+          "date": "2026-06-17",
+          "rs": 0.070125
+        },
+        {
+          "date": "2026-06-18",
+          "rs": 0.069123
+        },
+        {
+          "date": "2026-06-22",
+          "rs": 0.069345
+        },
+        {
+          "date": "2026-06-23",
+          "rs": 0.069345
+        },
+        {
+          "date": "2026-06-24",
+          "rs": 0.069773
+        },
+        {
+          "date": "2026-06-25",
+          "rs": 0.070598
+        },
+        {
+          "date": "2026-06-26",
+          "rs": 0.070783
+        },
+        {
+          "date": "2026-06-29",
+          "rs": 0.068367
+        },
+        {
+          "date": "2026-06-30",
+          "rs": 0.068066
+        },
+        {
+          "date": "2026-07-01",
+          "rs": 0.068413
+        },
+        {
+          "date": "2026-07-02",
+          "rs": 0.069833
+        },
+        {
+          "date": "2026-07-06",
+          "rs": 0.069189
+        },
+        {
+          "date": "2026-07-07",
+          "rs": 0.06889
+        },
+        {
+          "date": "2026-07-08",
+          "rs": 0.067293
+        },
+        {
+          "date": "2026-07-09",
+          "rs": 0.066861
+        },
+        {
+          "date": "2026-07-10",
+          "rs": 0.067408
+        },
+        {
+          "date": "2026-07-13",
+          "rs": 0.067515
+        },
+        {
+          "date": "2026-07-14",
+          "rs": 0.067356
+        },
+        {
+          "date": "2026-07-15",
+          "rs": 0.066904
+        },
+        {
+          "date": "2026-07-16",
+          "rs": 0.067788
+        },
+        {
+          "date": "2026-07-17",
+          "rs": 0.067982
+        },
+        {
+          "date": "2026-07-20",
+          "rs": 0.067418
+        },
+        {
+          "date": "2026-07-21",
+          "rs": 0.066954
+        },
+        {
+          "date": "2026-07-22",
+          "rs": 0.067995
+        },
+        {
+          "date": "2026-07-23",
+          "rs": 0.068127
+        },
+        {
+          "date": "2026-07-24",
+          "rs": 0.069371
+        },
+        {
+          "date": "2026-07-27",
+          "rs": 0.069531
+        },
+        {
+          "date": "2026-07-28",
+          "rs": 0.070648
+        },
+        {
+          "date": "2026-07-29",
+          "rs": 0.070929
+        },
+        {
+          "date": "2026-07-30",
+          "rs": 0.069625
+        },
+        {
+          "date": "2026-07-31",
+          "rs": 0.067507
+        },
+        {
+          "date": "2026-08-03",
+          "rs": 0.067325
+        },
+        {
+          "date": "2026-08-04",
+          "rs": 0.067416
+        },
+        {
+          "date": "2026-08-05",
+          "rs": 0.068382
+        },
+        {
+          "date": "2026-08-06",
+          "rs": 0.06788
+        },
+        {
+          "date": "2026-08-07",
+          "rs": 0.06836
+        },
+        {
+          "date": "2026-08-10",
+          "rs": 0.068794
+        },
+        {
+          "date": "2026-08-11",
+          "rs": 0.069093
+        },
+        {
+          "date": "2026-08-12",
+          "rs": 0.068066
+        },
+        {
+          "date": "2026-08-13",
+          "rs": 0.067247
+        },
+        {
+          "date": "2026-08-14",
+          "rs": 0.067677
+        },
+        {
+          "date": "2026-08-17",
+          "rs": 0.06761
+        },
+        {
+          "date": "2026-08-18",
+          "rs": 0.06747
+        },
+        {
+          "date": "2026-08-19",
+          "rs": 0.068291
+        },
+        {
+          "date": "2026-08-20",
+          "rs": 0.068739
+        },
+        {
+          "date": "2026-08-21",
+          "rs": 0.069921
+        },
+        {
+          "date": "2026-08-24",
+          "rs": 0.07018
+        },
+        {
+          "date": "2026-08-25",
+          "rs": 0.069956
+        },
+        {
+          "date": "2026-08-26",
+          "rs": 0.070058
+        },
+        {
+          "date": "2026-08-27",
+          "rs": 0.069031
+        },
+        {
+          "date": "2026-08-28",
+          "rs": 0.069123
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.068692
         }
       ]
     },
@@ -105160,23 +105160,19 @@
       "symbol": "XLP",
       "name": "Consumer Staples",
       "gics_sector": "Consumer Staples",
-      "price": 85.45,
-      "rs_value": 0.1111,
+      "price": 84.98,
+      "rs_value": 0.1108,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.0062,
-      "score": 36.9,
+      "rs_slope_norm": 0.007,
+      "score": 37.1,
       "stocks_n_risers": 3,
       "stocks_n_decayers": 5,
       "stocks_n_total": 34,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.115451
-        },
         {
           "date": "2026-04-23",
           "rs": 0.117835
@@ -105532,6 +105528,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.111068
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.110788
         }
       ]
     },
@@ -105539,23 +105539,19 @@
       "symbol": "XLF",
       "name": "Financials",
       "gics_sector": "Financials",
-      "price": 58.1,
-      "rs_value": 0.0755,
+      "price": 57.71,
+      "rs_value": 0.0752,
       "cloud_color": "green",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.004,
-      "score": 36.2,
+      "rs_slope_norm": 0.005,
+      "score": 36.5,
       "stocks_n_risers": 9,
       "stocks_n_decayers": 9,
       "stocks_n_total": 75,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.07341
-        },
         {
           "date": "2026-04-23",
           "rs": 0.073117
@@ -105911,6 +105907,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.075518
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.075236
         }
       ]
     },
@@ -105918,23 +105918,19 @@
       "symbol": "XLK",
       "name": "Technology",
       "gics_sector": "Information Technology",
-      "price": 185.69,
-      "rs_value": 0.2414,
+      "price": 186.5,
+      "rs_value": 0.2431,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": -0.0064,
-      "score": 33.1,
+      "rs_slope_norm": -0.0076,
+      "score": 32.7,
       "stocks_n_risers": 0,
       "stocks_n_decayers": 0,
       "stocks_n_total": 71,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.222283
-        },
         {
           "date": "2026-04-23",
           "rs": 0.219973
@@ -106290,6 +106286,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.24136
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.243139
         }
       ]
     },
@@ -106297,23 +106297,19 @@
       "symbol": "XLC",
       "name": "Communication Services",
       "gics_sector": "Communication Services",
-      "price": 112.99,
-      "rs_value": 0.1469,
+      "price": 111.46,
+      "rs_value": 0.1453,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.0074,
-      "score": 17.2,
+      "rs_slope_norm": 0.0084,
+      "score": 17.5,
       "stocks_n_risers": 2,
       "stocks_n_decayers": 2,
       "stocks_n_total": 22,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.165746
-        },
         {
           "date": "2026-04-23",
           "rs": 0.1657
@@ -106669,6 +106665,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.146864
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.14531
         }
       ]
     },
@@ -106676,23 +106676,19 @@
       "symbol": "XLRE",
       "name": "Real Estate",
       "gics_sector": "Real Estate",
-      "price": 44.48,
-      "rs_value": 0.0578,
+      "price": 44.11,
+      "rs_value": 0.0575,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": 0.001,
-      "score": 15.3,
+      "rs_slope_norm": -0.0007,
+      "score": 14.8,
       "stocks_n_risers": 2,
       "stocks_n_decayers": 3,
       "stocks_n_total": 31,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.061107
-        },
         {
           "date": "2026-04-23",
           "rs": 0.062051
@@ -107048,6 +107044,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.057815
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.057506
         }
       ]
     },
@@ -107055,23 +107055,19 @@
       "symbol": "XLY",
       "name": "Consumer Discretionary",
       "gics_sector": "Consumer Discretionary",
-      "price": 117.21,
-      "rs_value": 0.1523,
+      "price": 116.59,
+      "rs_value": 0.152,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": -0.0033,
-      "score": 14.0,
+      "rs_slope_norm": -0.0016,
+      "score": 14.5,
       "stocks_n_risers": 6,
       "stocks_n_decayers": 3,
       "stocks_n_total": 47,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.167222
-        },
         {
           "date": "2026-04-23",
           "rs": 0.166194
@@ -107427,6 +107423,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.152349
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.151998
         }
       ]
     },
@@ -107434,23 +107434,19 @@
       "symbol": "XLU",
       "name": "Utilities",
       "gics_sector": "Utilities",
-      "price": 42.73,
-      "rs_value": 0.0555,
+      "price": 42.23,
+      "rs_value": 0.0551,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": -0.0131,
-      "score": 11.1,
+      "rs_slope_norm": -0.0172,
+      "score": 9.8,
       "stocks_n_risers": 2,
       "stocks_n_decayers": 4,
       "stocks_n_total": 31,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.06309
-        },
         {
           "date": "2026-04-23",
           "rs": 0.065058
@@ -107806,6 +107802,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.05554
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.055055
         }
       ]
     },
@@ -107813,23 +107813,19 @@
       "symbol": "XLI",
       "name": "Industrials",
       "gics_sector": "Industrials",
-      "price": 177.14,
-      "rs_value": 0.2302,
+      "price": 175.13,
+      "rs_value": 0.2283,
       "cloud_color": "red",
       "bullish_crossover": false,
       "bearish_crossover": false,
       "days_since_crossover": null,
       "rs_new_high": false,
-      "rs_slope_norm": -0.0241,
-      "score": 7.8,
+      "rs_slope_norm": -0.0293,
+      "score": 6.2,
       "stocks_n_risers": 7,
       "stocks_n_decayers": 7,
       "stocks_n_total": 79,
       "rs_trajectory": [
-        {
-          "date": "2026-04-22",
-          "rs": 0.240492
-        },
         {
           "date": "2026-04-23",
           "rs": 0.245705
@@ -108185,6 +108181,10 @@
         {
           "date": "2026-08-28",
           "rs": 0.230246
+        },
+        {
+          "date": "2026-08-31",
+          "rs": 0.228316
         }
       ]
     }
