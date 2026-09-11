@@ -21,6 +21,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.etf_universe import benchmark_universe_tickers  # noqa: E402
+from src.price_scale import (  # noqa: E402
+    describe_report,
+    earliest_seam,
+    rebase_history_to_overlap,
+    repair_minor_unit_seams,
+    repair_split_seams,
+)
 from src.prices import download_prices  # noqa: E402
 # INIT-22 P9 strangler: read canonical daily Close FROM the price-archive (base) first, keeping the
 # OLD yfinance download_prices as a CLOSED fallback so production never stops. ONE canonical reader
@@ -33,7 +40,12 @@ try:
     _HAVE_BASE = True
 except ImportError:
     _HAVE_BASE = False
-from src.rank_history import HISTORY_COLUMNS, append_snapshot  # noqa: E402
+from src.rank_history import (  # noqa: E402
+    HISTORY_COLUMNS,
+    append_snapshot,
+    build_history_from_prices,
+    replace_history_from,
+)
 from src.render import render_dashboard_data  # noqa: E402
 from src.sector_engine import get_sector_dataframe  # noqa: E402
 from src.signal_engine import compute_cross_section  # noqa: E402
@@ -166,21 +178,46 @@ def maybe_refresh_market_caps() -> None:
     save(caps)
 
 
-def update_prices_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame:
+def _repair_scale(prices: pd.DataFrame, stage: str, acc: dict) -> pd.DataFrame:
+    """Seam repair (src/price_scale.py). A fetch after a split returns split-adjusted rows while
+    the stored history stays unadjusted; one series must never mix bases, so every stage is
+    repaired (units first -- a no-op for this USD-only universe -- then calendar-confirmed
+    splits) and the seams are accumulated into ``acc`` (ticker -> seam dates) so the rank
+    history can be rebuilt from the earliest one."""
+    repaired, units = repair_minor_unit_seams(prices)
+    if units:
+        print(f"  Unit repair ({stage}): {describe_report(units)}")
+    repaired, splits = repair_split_seams(repaired)
+    if splits:
+        print(f"  Split repair ({stage}): {describe_report(splits)} "
+              f"{ {t: [f for _, f in v] for t, v in splits.items()} }")
+    for report in (units, splits):
+        for t, seams in report.items():
+            acc.setdefault(t, []).extend(seams)
+    return repaired
+
+
+def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFrame, dict]:
     """
     Incremental update: ако имаме cache, изтегли само от последната дата нататък.
     Иначе зареди пълен 13-месечен прозорец.
+    Returns (prices, seam_report); a non-empty seam_report means the cache carried a split seam
+    and was repaired, so the rank history from the earliest seam must be rebuilt.
     """
     end = pd.Timestamp.today().normalize()
+    seams: dict = {}
 
     if PRICES_CACHE_PATH.exists():
         cached = pd.read_parquet(PRICES_CACHE_PATH)
         cached.index = pd.to_datetime(cached.index)
+        cached = _repair_scale(cached, "cache", seams)
+        if seams:
+            cached.to_parquet(PRICES_CACHE_PATH)
         last_date = cached.index.max()
 
         if last_date >= end - pd.tseries.offsets.BusinessDay(1):
             print(f"  Prices cache up to date ({last_date.date()}).")
-            return cached.tail(LOOKBACK_DAYS_FOR_SCORING + 30)
+            return cached.tail(LOOKBACK_DAYS_FOR_SCORING + 30), seams
 
         # Изтегли само нови дни — добавяме малко overlap за safety
         start = last_date - pd.Timedelta(days=5)
@@ -188,7 +225,15 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame:
         new_prices = _base_first_close(tickers, start, end, source_acc)
 
         if new_prices.empty:
-            return cached.tail(LOOKBACK_DAYS_FOR_SCORING + 30)
+            return cached.tail(LOOKBACK_DAYS_FOR_SCORING + 30), seams
+
+        # The re-read overlap days tell whether the stored history is on another basis (a split
+        # since the last run): move the history to the new basis BEFORE merging, so the seam
+        # never enters the cache. Ranks are unchanged by a constant factor.
+        cached, rebased = rebase_history_to_overlap(cached, new_prices)
+        if rebased:
+            print(f"  Overlap rebase: {len(rebased)} columns moved to the new basis "
+                  f"{ {t: round(k, 4) for t, k in list(rebased.items())[:8]} }")
 
         # Merge: новите данни презаписват overlap-а
         combined = pd.concat([
@@ -197,20 +242,22 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame:
         ]).sort_index()
         # Drop колони, които сега имат изцяло NaN (де-листвани ticker-и)
         combined = combined.dropna(axis=1, how="all")
+        combined = _repair_scale(combined, "merge", seams)
 
         # Trim cache: пазим само последните ~6 години (повече от достатъчно за scoring)
         cutoff = end - pd.DateOffset(years=6)
         trimmed = combined[combined.index >= cutoff]
         trimmed.to_parquet(PRICES_CACHE_PATH)
-        return trimmed.tail(LOOKBACK_DAYS_FOR_SCORING + 30)
+        return trimmed.tail(LOOKBACK_DAYS_FOR_SCORING + 30), seams
 
     # No cache — full download
     start = end - pd.Timedelta(days=int(LOOKBACK_DAYS_FOR_SCORING * 1.6))
     print(f"  Full download {start.date()} → {end.date()}")
     prices = _base_first_close(tickers, start, end, source_acc)
+    prices = _repair_scale(prices, "full", seams)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     prices.to_parquet(PRICES_CACHE_PATH)
-    return prices
+    return prices, seams
 
 
 def update_benchmark_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame:
@@ -270,7 +317,7 @@ def main() -> None:
     price_source: dict[str, str] = {}
 
     print("[2/6] Updating prices cache (base-first canonical; yfinance CLOSED fallback)...")
-    prices = update_prices_cache(tickers, price_source)
+    prices, seam_report = update_prices_cache(tickers, price_source)
     print(f"      {len(prices.columns)} tickers × {len(prices)} days")
 
     print("[3/6] Updating benchmark + sector ETF cache (SPY + 11 SPDR ETFs)...")
@@ -290,6 +337,16 @@ def main() -> None:
     print(f"      {len(cs)} valid scores for {cs['date'].iloc[0].date()}")
 
     print("[5/6] Appending snapshot to history...")
+    if seam_report:
+        # Every snapshot whose 12-1 window crossed a split seam ranked its ticker on a bogus
+        # momentum: rebuild the history from the earliest seam on the repaired prices
+        # (deterministic, same engine as the daily snapshot), then append today's as usual.
+        from_date = earliest_seam(seam_report)
+        rebuild_dates = prices.index[prices.index >= from_date]
+        print(f"      Scale seam at {from_date.date()} → rebuilding {len(rebuild_dates)} snapshots...")
+        rebuilt = build_history_from_prices(prices, rebuild_dates, sector_map=sector_map)
+        replace_history_from(HISTORY_PATH, from_date, rebuilt)
+        print(f"      Rebuilt {rebuilt['date'].nunique()} snapshots, {len(rebuilt)} rows")
     append_snapshot(HISTORY_PATH, cs[HISTORY_COLUMNS])
     size_mb = HISTORY_PATH.stat().st_size / 1e6
     print(f"      History now {size_mb:.1f} MB")

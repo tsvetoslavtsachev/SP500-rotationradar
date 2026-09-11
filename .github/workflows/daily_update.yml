@@ -83,6 +83,13 @@ jobs:
         if: ${{ env.DATACORE_RO_PAT != '' && env.PRICE_ARCHIVE_RO_PAT != '' }}
         run: python scripts/assert_base_sourced.py
 
+      # Scale gate (2026-09-11, STOXX 600 twin fix): a split seam in the price cache -- a fetch
+      # after a split returns split-adjusted rows while the stored history stays unadjusted --
+      # put DD at +339.1% and KLAC at -78.8% on a pure 12-1 momentum. Fail RED before anything is
+      # committed: no unexplained mom_12_1_pct < -90.
+      - name: Scale gate (split seams, extreme losers)
+        run: python -m pytest -q tests/test_scale_gate.py
+
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
