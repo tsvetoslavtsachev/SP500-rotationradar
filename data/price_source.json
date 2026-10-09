@@ -121,7 +121,6 @@
     "CSX": "base",
     "CTAS": "base",
     "CTSH": "base",
-    "CTVA": "base",
     "CVNA": "base",
     "CVS": "base",
     "CVX": "base",
@@ -379,7 +378,6 @@
     "PPL": "base",
     "PRU": "base",
     "PSA": "base",
-    "PSKY": "base",
     "PSX": "base",
     "PTC": "base",
     "PWR": "base",
@@ -406,6 +404,7 @@
     "SCHW": "base",
     "SHW": "base",
     "SJM": "base",
+    "SKYD": "fetch",
     "SLB": "base",
     "SMCI": "base",
     "SNA": "base",
@@ -451,6 +450,7 @@
     "TSN": "base",
     "TT": "base",
     "TTWO": "base",
+    "TWLO": "fetch",
     "TXN": "base",
     "TXT": "base",
     "TYL": "base",
@@ -478,10 +478,10 @@
     "VST": "base",
     "VTR": "base",
     "VTRS": "base",
+    "VYLR": "fetch",
     "VZ": "base",
     "WAB": "base",
     "WAT": "base",
-    "WBD": "base",
     "WDAY": "base",
     "WDC": "base",
     "WEC": "base",
@@ -519,7 +519,7 @@
   "summary": {
     "expected": 515,
     "covered": 515,
-    "base": 510,
-    "fetch": 5
+    "base": 507,
+    "fetch": 8
   }
 }
