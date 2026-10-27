@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-27T23:04:49",
+  "updated": "2026-10-27T01:16:36",
   "tickers": {
     "MMM": {
       "name": "3M",
@@ -203,8 +203,8 @@
     },
     "APP": {
       "name": "AppLovin",
-      "gics_sector": "Information Technology",
-      "gics_sub_industry": "Application Software"
+      "gics_sector": "Communication Services",
+      "gics_sub_industry": "Advertising"
     },
     "APTV": {
       "name": "Aptiv",
@@ -265,11 +265,6 @@
       "name": "AutoZone",
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Automotive Retail"
-    },
-    "AVB": {
-      "name": "AvalonBay Communities",
-      "gics_sector": "Real Estate",
-      "gics_sub_industry": "Multi-Family Residential REITs"
     },
     "AVY": {
       "name": "Avery Dennison",
@@ -341,6 +336,11 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Transaction & Payment Processing Services"
     },
+    "BE": {
+      "name": "Bloom Energy",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Electrical Components & Equipment"
+    },
     "BNY": {
       "name": "BNY Mellon",
       "gics_sector": "Financials",
@@ -385,11 +385,6 @@
       "name": "Brown–Forman",
       "gics_sector": "Consumer Staples",
       "gics_sub_industry": "Distillers & Vintners"
-    },
-    "BLDR": {
-      "name": "Builders FirstSource",
-      "gics_sector": "Industrials",
-      "gics_sub_industry": "Building Products"
     },
     "BG": {
       "name": "Bunge Global",
@@ -646,11 +641,6 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Transaction & Payment Processing Services"
     },
-    "CTVA": {
-      "name": "Corteva",
-      "gics_sector": "Materials",
-      "gics_sub_industry": "Fertilizers & Agricultural Chemicals"
-    },
     "CSGP": {
       "name": "CoStar Group",
       "gics_sector": "Real Estate",
@@ -803,8 +793,8 @@
     },
     "DD": {
       "name": "DuPont",
-      "gics_sector": "Materials",
-      "gics_sub_industry": "Specialty Chemicals"
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Industrial Conglomerates"
     },
     "ETN": {
       "name": "Eaton Corporation",
@@ -835,11 +825,6 @@
       "name": "Edwards Lifesciences",
       "gics_sector": "Health Care",
       "gics_sub_industry": "Health Care Equipment"
-    },
-    "EA": {
-      "name": "Electronic Arts",
-      "gics_sector": "Communication Services",
-      "gics_sub_industry": "Interactive Home Entertainment"
     },
     "ELV": {
       "name": "Elevance Health",
@@ -881,11 +866,6 @@
       "gics_sector": "Real Estate",
       "gics_sub_industry": "Data Center REITs"
     },
-    "EQR": {
-      "name": "Equity Residential",
-      "gics_sector": "Real Estate",
-      "gics_sub_industry": "Multi-Family Residential REITs"
-    },
     "ERIE": {
       "name": "Erie Indemnity",
       "gics_sector": "Financials",
@@ -910,6 +890,11 @@
       "name": "Evergy",
       "gics_sector": "Utilities",
       "gics_sub_industry": "Electric Utilities"
+    },
+    "P": {
+      "name": "Everpure",
+      "gics_sector": "Information Technology",
+      "gics_sub_industry": "Technology Hardware, Storage & Peripherals"
     },
     "ES": {
       "name": "Eversource Energy",
@@ -980,6 +965,11 @@
       "name": "FedEx Freight",
       "gics_sector": "Industrials",
       "gics_sub_industry": "Cargo Ground Transportation"
+    },
+    "FERG": {
+      "name": "Ferguson Enterprises",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Trading Companies & Distributors"
     },
     "FIS": {
       "name": "Fidelity National Information Services",
@@ -1245,6 +1235,11 @@
       "name": "Illinois Tool Works",
       "gics_sector": "Industrials",
       "gics_sub_industry": "Industrial Machinery & Supplies & Components"
+    },
+    "ILMN": {
+      "name": "Illumina, Inc.",
+      "gics_sector": "Health Care",
+      "gics_sub_industry": "Life Sciences Tools & Services"
     },
     "INCY": {
       "name": "Incyte",
@@ -1537,7 +1532,7 @@
       "gics_sub_industry": "Restaurants"
     },
     "MCK": {
-      "name": "McKesson Corporation",
+      "name": "McKesson",
       "gics_sector": "Health Care",
       "gics_sub_industry": "Health Care Distributors"
     },
@@ -1596,11 +1591,6 @@
       "gics_sector": "Health Care",
       "gics_sub_industry": "Biotechnology"
     },
-    "TAP": {
-      "name": "Molson Coors Beverage Company",
-      "gics_sector": "Consumer Staples",
-      "gics_sub_industry": "Brewers"
-    },
     "MDLZ": {
       "name": "Mondelez International",
       "gics_sector": "Consumer Staples",
@@ -1637,7 +1627,7 @@
       "gics_sub_industry": "Communications Equipment"
     },
     "MSCI": {
-      "name": "MSCI Inc.",
+      "name": "MSCI",
       "gics_sector": "Financials",
       "gics_sub_industry": "Financial Exchanges & Data"
     },
@@ -1737,7 +1727,7 @@
       "gics_sub_industry": "Semiconductors"
     },
     "ORLY": {
-      "name": "O’Reilly Automotive",
+      "name": "O'Reilly Automotive",
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Automotive Retail"
     },
@@ -1795,11 +1785,6 @@
       "name": "Palo Alto Networks",
       "gics_sector": "Information Technology",
       "gics_sub_industry": "Systems Software"
-    },
-    "PSKY": {
-      "name": "Paramount Skydance Corporation",
-      "gics_sector": "Communication Services",
-      "gics_sub_industry": "Movies & Entertainment"
     },
     "PH": {
       "name": "Parker Hannifin",
@@ -1911,25 +1896,25 @@
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Homebuilding"
     },
-    "PWR": {
-      "name": "Quanta Services",
-      "gics_sector": "Industrials",
-      "gics_sub_industry": "Construction & Engineering"
+    "Q": {
+      "name": "Qnity Electronics",
+      "gics_sector": "Information Technology",
+      "gics_sub_industry": "Semiconductor Materials & Equipment"
     },
     "QCOM": {
       "name": "Qualcomm",
       "gics_sector": "Information Technology",
       "gics_sub_industry": "Semiconductors"
     },
+    "PWR": {
+      "name": "Quanta Services",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Construction & Engineering"
+    },
     "DGX": {
       "name": "Quest Diagnostics",
       "gics_sector": "Health Care",
       "gics_sub_industry": "Health Care Services"
-    },
-    "Q": {
-      "name": "Qnity Electronics",
-      "gics_sector": "Information Technology",
-      "gics_sub_industry": "Semiconductor Materials & Equipment"
     },
     "RL": {
       "name": "Ralph Lauren Corporation",
@@ -1941,10 +1926,10 @@
       "gics_sector": "Financials",
       "gics_sub_industry": "Investment Banking & Brokerage"
     },
-    "RTX": {
-      "name": "RTX Corporation",
-      "gics_sector": "Industrials",
-      "gics_sub_industry": "Aerospace & Defense"
+    "RDDT": {
+      "name": "Reddit",
+      "gics_sector": "Communication Services",
+      "gics_sub_industry": "Interactive Media & Services"
     },
     "O": {
       "name": "Realty Income",
@@ -2011,6 +1996,11 @@
       "gics_sector": "Consumer Discretionary",
       "gics_sub_industry": "Hotels, Resorts & Cruise Lines"
     },
+    "RTX": {
+      "name": "RTX Corporation",
+      "gics_sector": "Industrials",
+      "gics_sub_industry": "Aerospace & Defense"
+    },
     "SPGI": {
       "name": "S&P Global",
       "gics_sector": "Financials",
@@ -2060,6 +2050,11 @@
       "name": "Simon Property Group",
       "gics_sector": "Real Estate",
       "gics_sub_industry": "Retail REITs"
+    },
+    "SKYD": {
+      "name": "Skydance",
+      "gics_sector": "Communication Services",
+      "gics_sub_industry": "Movies & Entertainment"
     },
     "SWKS": {
       "name": "Skyworks Solutions",
@@ -2226,11 +2221,6 @@
       "gics_sector": "Communication Services",
       "gics_sub_industry": "Movies & Entertainment"
     },
-    "TTD": {
-      "name": "Trade Desk (The)",
-      "gics_sector": "Communication Services",
-      "gics_sub_industry": "Advertising"
-    },
     "TSCO": {
       "name": "Tractor Supply",
       "gics_sector": "Consumer Discretionary",
@@ -2260,6 +2250,11 @@
       "name": "Truist Financial",
       "gics_sector": "Financials",
       "gics_sub_industry": "Diversified Banks"
+    },
+    "TWLO": {
+      "name": "Twilio",
+      "gics_sector": "Information Technology",
+      "gics_sub_industry": "Systems Software"
     },
     "TYL": {
       "name": "Tyler Technologies",
@@ -2386,10 +2381,20 @@
       "gics_sector": "Utilities",
       "gics_sub_industry": "Electric Utilities"
     },
+    "VMRK": {
+      "name": "Vivmark Residential",
+      "gics_sector": "Real Estate",
+      "gics_sub_industry": "Multi-Family Residential REITs"
+    },
     "VMC": {
       "name": "Vulcan Materials Company",
       "gics_sector": "Materials",
       "gics_sub_industry": "Construction Materials"
+    },
+    "VYLR": {
+      "name": "Vylor",
+      "gics_sector": "Consumer Staples",
+      "gics_sub_industry": "Agricultural Products & Services"
     },
     "WRB": {
       "name": "W. R. Berkley Corporation",
@@ -2415,11 +2420,6 @@
       "name": "Walt Disney Company (The)",
       "gics_sector": "Communication Services",
       "gics_sub_industry": "Movies & Entertainment"
-    },
-    "WBD": {
-      "name": "Warner Bros. Discovery",
-      "gics_sector": "Communication Services",
-      "gics_sub_industry": "Broadcasting"
     },
     "WM": {
       "name": "Waste Management",
