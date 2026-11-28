@@ -408,7 +408,7 @@
     "SLB": "base",
     "SMCI": "base",
     "SNA": "base",
-    "SNDK": "base",
+    "SNDK": "fetch",
     "SNPS": "base",
     "SO": "base",
     "SOLV": "base",
@@ -519,7 +519,7 @@
   "summary": {
     "expected": 515,
     "covered": 515,
-    "base": 515,
-    "fetch": 0
+    "base": 514,
+    "fetch": 1
   }
 }
