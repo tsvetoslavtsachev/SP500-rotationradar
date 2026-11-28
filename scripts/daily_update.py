@@ -20,6 +20,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.complete_days import drop_partial_tail  # noqa: E402  (ПРОЛЕТР6)
 from src.etf_universe import benchmark_universe_tickers  # noqa: E402
 from src.price_scale import (  # noqa: E402
     describe_report,
@@ -197,6 +198,21 @@ def _repair_scale(prices: pd.DataFrame, stage: str, acc: dict) -> pd.DataFrame:
     return repaired
 
 
+def _today() -> pd.Timestamp:
+    """Today's date (a seam for the tests, ПРОЛЕТР6)."""
+    return pd.Timestamp.today().normalize()
+
+
+def _hold_back_partial(df: pd.DataFrame, what: str) -> pd.DataFrame:
+    """ПРОЛЕТР6: a partial trailing day (prices for < 95% of the names) is neither used
+    nor written; the next run reads it again (src/complete_days.py says why)."""
+    trimmed, dropped = drop_partial_tail(df)
+    if dropped:
+        print(f"  {what}: partial day(s) held back {[str(d.date()) for d in dropped]} "
+              f"({int(df.loc[dropped[-1]].notna().sum())} of {df.shape[1]} prices)")
+    return trimmed
+
+
 def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFrame, dict]:
     """
     Incremental update: ако имаме cache, изтегли само от последната дата нататък.
@@ -204,7 +220,7 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFr
     Returns (prices, seam_report); a non-empty seam_report means the cache carried a split seam
     and was repaired, so the rank history from the earliest seam must be rebuilt.
     """
-    end = pd.Timestamp.today().normalize()
+    end = _today()
     seams: dict = {}
 
     if PRICES_CACHE_PATH.exists():
@@ -212,6 +228,10 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFr
         cached.index = pd.to_datetime(cached.index)
         cached = _repair_scale(cached, "cache", seams)
         if seams:
+            cached.to_parquet(PRICES_CACHE_PATH)
+        n_rows = len(cached)
+        cached = _hold_back_partial(cached, "Prices cache")
+        if len(cached) < n_rows:     # the file feeds render too: it must not keep the partial day
             cached.to_parquet(PRICES_CACHE_PATH)
         last_date = cached.index.max()
 
@@ -243,6 +263,7 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFr
         # Drop колони, които сега имат изцяло NaN (де-листвани ticker-и)
         combined = combined.dropna(axis=1, how="all")
         combined = _repair_scale(combined, "merge", seams)
+        combined = _hold_back_partial(combined, "Prices merge")
 
         # Trim cache: пазим само последните ~6 години (повече от достатъчно за scoring)
         cutoff = end - pd.DateOffset(years=6)
@@ -255,6 +276,7 @@ def update_prices_cache(tickers: list[str], source_acc: dict) -> tuple[pd.DataFr
     print(f"  Full download {start.date()} → {end.date()}")
     prices = _base_first_close(tickers, start, end, source_acc)
     prices = _repair_scale(prices, "full", seams)
+    prices = _hold_back_partial(prices, "Prices full")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     prices.to_parquet(PRICES_CACHE_PATH)
     return prices, seams
@@ -266,11 +288,15 @@ def update_benchmark_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame
     Държи се отделно от prices_cache, за да не замърси sector z-score изчислението.
     Lookback: 2 години (50 SMA + 252-day high буфер).
     """
-    end = pd.Timestamp.today().normalize()
+    end = _today()
 
     if BENCHMARK_PRICES_PATH.exists():
         cached = pd.read_parquet(BENCHMARK_PRICES_PATH)
         cached.index = pd.to_datetime(cached.index)
+        n_rows = len(cached)
+        cached = _hold_back_partial(cached, "Benchmark cache")
+        if len(cached) < n_rows:     # the file feeds render too: it must not keep the partial day
+            cached.to_parquet(BENCHMARK_PRICES_PATH)
         last_date = cached.index.max()
 
         if last_date >= end - pd.tseries.offsets.BusinessDay(1):
@@ -289,6 +315,7 @@ def update_benchmark_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame
             new_prices,
         ]).sort_index()
         combined = combined.dropna(axis=1, how="all")
+        combined = _hold_back_partial(combined, "Benchmark merge")
 
         cutoff = end - pd.Timedelta(days=BENCHMARK_LOOKBACK_DAYS + 60)
         trimmed = combined[combined.index >= cutoff]
@@ -299,9 +326,20 @@ def update_benchmark_cache(tickers: list[str], source_acc: dict) -> pd.DataFrame
     start = end - pd.Timedelta(days=BENCHMARK_LOOKBACK_DAYS + 60)
     print(f"  Benchmark full download {start.date()} → {end.date()} ({len(tickers)} tickers)")
     prices = _base_first_close(tickers, start, end, source_acc)
+    prices = _hold_back_partial(prices, "Benchmark full")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     prices.to_parquet(BENCHMARK_PRICES_PATH)
     return prices
+
+
+def check_as_of_is_returns_day(payload: dict, prices: pd.DataFrame) -> None:
+    """ПРОЛЕТР6 gate: the page's as_of is the day the returns run to (the last row of the
+    price cache, which holds no partial day). A mismatch stops the run before the commit."""
+    returns_day = str(prices.index.max().date())
+    for where, val in (("metadata.as_of", payload["metadata"].get("as_of")),
+                       ("screener.as_of", (payload.get("screener") or {}).get("as_of"))):
+        if val is not None and val != returns_day:
+            raise SystemExit(f"FAIL (ПРОЛЕТР6): {where} {val} != returns day {returns_day}")
 
 
 def main() -> None:
@@ -355,6 +393,7 @@ def main() -> None:
     maybe_refresh_market_caps()
     payload = render_dashboard_data()
     print(f"      Rendered: as of {payload['metadata']['as_of']}")
+    check_as_of_is_returns_day(payload, prices)
     print(
         f"      Stable Winners 1m: {len(payload['stable_winners_1m'])} | "
         f"Quality Dip 1m: {len(payload['quality_dip_1m'])} | "
